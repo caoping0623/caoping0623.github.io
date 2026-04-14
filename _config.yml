@@ -1,0 +1,55 @@
+title: "Cao Ping 的技术博客"
+description: "分享技术心得、编程经验与学习笔记"
+author:
+  name: "Cao Ping"
+  email: ""
+  github: "caoping0623"
+
+url: "https://caoping0623.github.io"
+baseurl: ""
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: /:year/:month/:day/:title/
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Pagination
+paginate: 10
+paginate_path: "/page/:num/"
+
+# Collections
+collections:
+  posts:
+    output: true
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      author: "Cao Ping"
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# Navigation
+nav:
+  - title: "首页"
+    url: "/"
+  - title: "分类"
+    url: "/categories/"
+  - title: "标签"
+    url: "/tags/"
+  - title: "关于"
+    url: "/about/"
