@@ -76,6 +76,7 @@ layout: default
     if (headings.length === 0) return;
 
     headings.forEach(function (h) {
+      if (!h.id) return;
       var li = document.createElement('li');
       li.className = 'toc-item toc-' + h.tagName.toLowerCase();
       var a = document.createElement('a');
