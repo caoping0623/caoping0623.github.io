@@ -6,16 +6,8 @@ permalink: /
 <div class="container">
   <section class="hero">
     <div class="hero-avatar">👨‍💻</div>
-    <h1>你好，我是 <span>Cao Ping</span></h1>
-    <p>热爱技术、持续学习。在这里分享编程经验、架构思考与工程实践。</p>
-    <div class="hero-badges">
-      <span class="badge">🐍 Python</span>
-      <span class="badge">☕ Java</span>
-      <span class="badge">🐹 Go</span>
-      <span class="badge">⚛️ React</span>
-      <span class="badge">🐳 Docker</span>
-      <span class="badge">☁️ Cloud Native</span>
-    </div>
+    <h1><span>Cao Ping</span></h1>
+    <p>持续进化</p>
   </section>
 
   <h2 class="section-heading">最新文章</h2>
