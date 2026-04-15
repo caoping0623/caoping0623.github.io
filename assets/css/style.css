@@ -278,7 +278,8 @@ pre code {
   stroke-width: 0.5px !important;
 }
 .mermaid .marker,
-.mermaid .arrowheadPath {
+.mermaid .arrowheadPath,
+.mermaid .arrowMarkerPath {
   stroke: #c0a0d8 !important;
   fill: #c0a0d8 !important;
   stroke-width: 0.5px !important;
