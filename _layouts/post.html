@@ -2,6 +2,28 @@
 layout: default
 ---
 
+<!-- TOC Toggle Button -->
+<button class="toc-toggle-btn" id="toc-toggle" aria-label="打开目录">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <line x1="3" y1="12" x2="21" y2="12"/>
+    <line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+  <span class="toc-btn-label">目录</span>
+</button>
+
+<!-- TOC Sidebar Panel -->
+<nav class="toc-sidebar" id="toc-sidebar" aria-label="文章目录">
+  <div class="toc-sidebar-header">
+    <span class="toc-sidebar-title">目录</span>
+    <button class="toc-close-btn" id="toc-close" aria-label="关闭目录">×</button>
+  </div>
+  <ul class="toc-sidebar-list" id="toc-list"></ul>
+</nav>
+
+<!-- TOC Backdrop -->
+<div class="toc-backdrop" id="toc-backdrop"></div>
+
 <article>
   <div class="container">
     <header class="post-header">
@@ -23,17 +45,6 @@ layout: default
     </header>
 
     <div class="post-content">
-      <!-- Inline collapsible TOC (populated by JS) -->
-      <div class="toc-inline" id="toc-inline" style="display:none">
-        <button class="toc-inline-toggle" id="toc-toggle" aria-expanded="true">
-          <span>📋 目录</span>
-          <span class="toc-toggle-icon" id="toc-arrow">▲</span>
-        </button>
-        <div class="toc-inline-body" id="toc-body">
-          <ul class="toc-inline-list" id="toc-list"></ul>
-        </div>
-      </div>
-
       {{ content }}
     </div>
   </div>
@@ -41,54 +52,45 @@ layout: default
 
 <script>
 (function () {
-  var tocInline = document.getElementById('toc-inline');
   var toggleBtn = document.getElementById('toc-toggle');
-  var tocBody   = document.getElementById('toc-body');
-  var tocArrow  = document.getElementById('toc-arrow');
+  var sidebar   = document.getElementById('toc-sidebar');
+  var closeBtn  = document.getElementById('toc-close');
+  var backdrop  = document.getElementById('toc-backdrop');
   var tocList   = document.getElementById('toc-list');
-  var isOpen    = true;
 
-  function openTOC() {
-    isOpen = true;
-    tocBody.style.display = '';
-    tocArrow.textContent = '▲';
-    toggleBtn.setAttribute('aria-expanded', 'true');
-  }
-  function closeTOC() {
-    isOpen = false;
-    tocBody.style.display = 'none';
-    tocArrow.textContent = '▼';
-    toggleBtn.setAttribute('aria-expanded', 'false');
-  }
+  function openTOC()  { sidebar.classList.add('toc-open');    backdrop.classList.add('toc-open'); }
+  function closeTOC() { sidebar.classList.remove('toc-open'); backdrop.classList.remove('toc-open'); }
 
-  toggleBtn && toggleBtn.addEventListener('click', function () {
-    if (isOpen) closeTOC(); else openTOC();
-  });
+  toggleBtn && toggleBtn.addEventListener('click', openTOC);
+  closeBtn  && closeBtn.addEventListener('click', closeTOC);
+  backdrop  && backdrop.addEventListener('click', closeTOC);
 
+  // Close on Escape key
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && isOpen) closeTOC();
+    if (e.key === 'Escape') closeTOC();
   });
 
   // Build TOC from post headings
   var content = document.querySelector('.post-content');
   if (tocList && content) {
     var headings = content.querySelectorAll('h2, h3');
-    if (headings.length === 0) return;
-
+    if (headings.length === 0) {
+      toggleBtn && (toggleBtn.style.display = 'none');
+      return;
+    }
     headings.forEach(function (h) {
-      if (!h.id) return;
       var li = document.createElement('li');
       li.className = 'toc-item toc-' + h.tagName.toLowerCase();
       var a = document.createElement('a');
-      a.href = '#' + h.id;
+      a.href  = '#' + h.id;
       a.textContent = h.textContent.replace(/^#+\s*/, '');
+      a.addEventListener('click', function () {
+        // On small screens close the panel after navigating
+        if (window.innerWidth < 900) closeTOC();
+      });
       li.appendChild(a);
       tocList.appendChild(li);
     });
-
-    // Reveal the TOC box and open it by default
-    tocInline.style.display = '';
-    openTOC();
 
     // Highlight active section on scroll
     var items = tocList.querySelectorAll('.toc-item a');
