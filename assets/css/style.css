@@ -268,17 +268,31 @@ pre code {
 .pagination a:hover { border-color: var(--color-primary); color: var(--color-primary-light); }
 .pagination .current { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
 
-/* ===== Mermaid flowchart: thinner edges ===== */
+/* ===== Mermaid flowchart: thinner edges + lavender arrows ===== */
 .mermaid .flowchart-link,
 .mermaid .edgePath path,
 .mermaid path.transition,
 .mermaid .messageLine0,
 .mermaid .messageLine1 {
+  stroke: #c0a0d8 !important;
   stroke-width: 0.5px !important;
 }
 .mermaid .marker,
 .mermaid .arrowheadPath {
+  stroke: #c0a0d8 !important;
+  fill: #c0a0d8 !important;
   stroke-width: 0.5px !important;
+}
+
+/* ===== Mermaid subgraph clusters: soft pink container ===== */
+.mermaid .cluster rect {
+  fill: #fff5f8 !important;
+  stroke: #f5b8c8 !important;
+  stroke-width: 1px !important;
+}
+.mermaid .cluster .label,
+.mermaid .cluster .nodeLabel {
+  color: #e07090 !important;
 }
 
 /* ===== Inline collapsible TOC ===== */
