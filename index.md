@@ -155,7 +155,7 @@ permalink: /
 
 <div class="container">
   <section class="hero">
-    <div class="hero-avatar">👨‍💻</div>
+    <div class="hero-avatar"><img src="{{ '/assets/css/头像.png' | relative_url }}" alt="avatar"></div>
     <h1><span>Cao Ping</span></h1>
     <p>持续进化</p>
   </section>

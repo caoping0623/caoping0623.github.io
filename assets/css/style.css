@@ -69,6 +69,10 @@ a:hover { color: var(--color-accent); }
   font-size: 2.5rem;
   background: var(--color-surface);
   box-shadow: 0 0 30px rgba(180,155,200,0.25);
+  overflow: hidden;
+}
+.hero-avatar img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
 }
 .hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.75rem; }
 .hero h1 span { color: var(--color-primary); }
