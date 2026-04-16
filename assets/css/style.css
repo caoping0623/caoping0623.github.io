@@ -11,7 +11,7 @@
   --color-text: #3d3556;
   --color-text-muted: #7e7490;
   --color-code-bg: #f0ece5;
-  --font-sans: 'Comic Sans MS', 'Comic Sans', 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
   --radius: 14px;
   --shadow: 0 4px 20px rgba(160,140,180,0.12);
