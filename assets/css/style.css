@@ -423,6 +423,18 @@ pre code {
 }
 .toc-backdrop.toc-open { display: block; }
 
+/* ===== Neural-node canvas (homepage top-left quarter) ===== */
+#neuro-canvas {
+  position: fixed;
+  top: 60px;   /* below sticky header */
+  left: 0;
+  width: 50vw;
+  height: 50vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.75;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 640px) {
   .hero h1 { font-size: 1.7rem; }
