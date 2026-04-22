@@ -430,10 +430,10 @@ pre code {
 /* ===== Neural-node canvas (homepage top-left quarter) ===== */
 #neuro-canvas {
   position: fixed;
-  top: 60px;   /* below sticky header */
+  top: 0;
   left: 0;
-  width: 50vw;
-  height: 50vh;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   z-index: 0;
   opacity: 0.75;
