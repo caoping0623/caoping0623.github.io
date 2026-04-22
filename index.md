@@ -17,8 +17,8 @@ permalink: /
   var nodes = [];
 
   function resize() {
-    W = Math.round(window.innerWidth * 0.5);
-    H = Math.round(window.innerHeight * 0.5);
+    W = Math.round(window.innerWidth);
+    H = Math.round(window.innerHeight);
     canvas.width  = W;
     canvas.height = H;
   }
