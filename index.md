@@ -11,8 +11,8 @@ permalink: /
   var ctx = canvas.getContext('2d');
 
   var W, H;
-  var NODE_COUNT = 48;
-  var MAX_DIST = 160;
+  var NODE_COUNT = 32;
+  var MAX_DIST = 130;
   var mouse = { x: -9999, y: -9999 };
   var nodes = [];
 
