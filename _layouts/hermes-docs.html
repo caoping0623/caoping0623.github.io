@@ -1,0 +1,285 @@
+---
+layout: default
+---
+<link rel="stylesheet" href="{{ '/assets/css/hermes-docs.css' | relative_url }}">
+
+<div class="hd-wrapper">
+
+  <!-- Mobile header -->
+  <div class="hd-mobile-bar">
+    <button class="hd-menu-btn" id="hd-menu-btn" aria-label="打开目录">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <span>文档目录</span>
+    </button>
+    <span class="hd-mobile-title" id="hd-mobile-title">Hermes Agent 文档</span>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="hd-sidebar" id="hd-sidebar" aria-label="Hermes Docs 目录">
+    <div class="hd-sidebar-header">
+      <a href="#/" class="hd-sidebar-title" data-page="home">
+        <span class="hd-logo-mark">⚡</span>
+        Hermes Agent 文档
+      </a>
+      <button class="hd-close-btn" id="hd-close-btn" aria-label="关闭目录">×</button>
+    </div>
+    <div class="hd-sidebar-search">
+      <input type="search" id="hd-search" placeholder="🔍  搜索页面标题…" autocomplete="off">
+    </div>
+    <nav class="hd-nav" id="hd-nav">
+      <!-- Navigation is injected from the data-nav JSON block in the post -->
+    </nav>
+    <div class="hd-sidebar-footer">
+      <a href="https://hermes-agent.nousresearch.com/docs/" target="_blank" rel="noopener">英文原版文档 ↗</a>
+      <a href="https://github.com/NousResearch/hermes-agent" target="_blank" rel="noopener">GitHub 仓库 ↗</a>
+    </div>
+  </aside>
+  <div class="hd-backdrop" id="hd-backdrop"></div>
+
+  <!-- Main content -->
+  <main class="hd-main">
+    <div class="hd-breadcrumbs" id="hd-breadcrumbs"></div>
+    <article class="hd-article" id="hd-article">
+      {{ content }}
+    </article>
+    <div class="hd-pager" id="hd-pager"></div>
+    <footer class="hd-article-footer">
+      <p>本页为 <a href="https://hermes-agent.nousresearch.com/docs/" target="_blank" rel="noopener">Hermes Agent 官方英文文档</a> 的简体中文版。命令、配置、代码、专有名词（Hermes、MCP、Nous Research、Telegram、Discord 等）保持英文原样以避免歧义。如发现翻译与原文不一致，请以英文原文为准。</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  // ---------- Navigation data ----------
+  var navEl = document.getElementById('hd-nav');
+  var navDataEl = document.getElementById('hd-nav-data');
+  var nav = [];
+  if (navDataEl) {
+    try { nav = JSON.parse(navDataEl.textContent); } catch (e) { console.error('Nav parse error', e); }
+  }
+
+  // Flatten nav for quick lookup: id -> {title, parents: [labels]}
+  var pageMap = {};
+  var orderedIds = [];
+
+  function walk(items, parents) {
+    items.forEach(function (item) {
+      if (item.type === 'category') {
+        walk(item.items, parents.concat([item.label]));
+      } else {
+        pageMap[item.id] = { title: item.title, parents: parents.slice() };
+        orderedIds.push(item.id);
+      }
+    });
+  }
+  walk(nav, []);
+
+  // ---------- Build sidebar DOM ----------
+  function renderNav(items, depth, container) {
+    items.forEach(function (item) {
+      if (item.type === 'category') {
+        var groupId = 'grp-' + Math.random().toString(36).slice(2, 8);
+        var group = document.createElement('div');
+        group.className = 'hd-nav-group hd-depth-' + depth;
+
+        var btn = document.createElement('button');
+        btn.className = 'hd-nav-group-btn';
+        btn.type = 'button';
+        btn.setAttribute('aria-expanded', depth === 0 ? 'true' : 'false');
+        btn.innerHTML = '<span class="hd-caret">▸</span><span class="hd-group-label">' + escapeHtml(item.label) + '</span>';
+        group.appendChild(btn);
+
+        var sub = document.createElement('div');
+        sub.className = 'hd-nav-sub';
+        if (depth === 0) sub.classList.add('hd-open');
+        group.appendChild(sub);
+
+        btn.addEventListener('click', function () {
+          var open = sub.classList.toggle('hd-open');
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+
+        renderNav(item.items, depth + 1, sub);
+        container.appendChild(group);
+      } else {
+        var a = document.createElement('a');
+        a.className = 'hd-nav-link hd-depth-' + depth;
+        a.href = '#/' + item.id;
+        a.dataset.page = item.id;
+        a.textContent = item.title;
+        container.appendChild(a);
+      }
+    });
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  if (navEl) renderNav(nav, 0, navEl);
+
+  // ---------- Page switching ----------
+  var article = document.getElementById('hd-article');
+  var sections = article.querySelectorAll('section[data-page]');
+  var defaultPage = 'home';
+
+  function showPage(id) {
+    if (!pageMap[id] && id !== 'home') {
+      id = defaultPage;
+    }
+    var found = false;
+    sections.forEach(function (sec) {
+      if (sec.dataset.page === id) {
+        sec.classList.add('hd-active');
+        found = true;
+      } else {
+        sec.classList.remove('hd-active');
+      }
+    });
+    if (!found) {
+      sections.forEach(function (sec) {
+        if (sec.dataset.page === defaultPage) sec.classList.add('hd-active');
+      });
+      id = defaultPage;
+    }
+
+    // Highlight sidebar link + open its parents
+    var links = document.querySelectorAll('.hd-nav-link');
+    links.forEach(function (a) {
+      if (a.dataset.page === id) {
+        a.classList.add('hd-active');
+        // Open all ancestor groups
+        var parent = a.parentElement;
+        while (parent && parent !== navEl) {
+          if (parent.classList && parent.classList.contains('hd-nav-sub')) {
+            parent.classList.add('hd-open');
+            var btn = parent.previousElementSibling;
+            if (btn && btn.classList.contains('hd-nav-group-btn')) {
+              btn.setAttribute('aria-expanded', 'true');
+            }
+          }
+          parent = parent.parentElement;
+        }
+        // Scroll it into view inside the sidebar
+        try { a.scrollIntoView({ block: 'nearest' }); } catch(e){}
+      } else {
+        a.classList.remove('hd-active');
+      }
+    });
+
+    // Breadcrumbs + mobile title
+    var bc = document.getElementById('hd-breadcrumbs');
+    var mobileTitle = document.getElementById('hd-mobile-title');
+    var info = pageMap[id];
+    if (id === 'home') {
+      bc.innerHTML = '<span>Hermes Agent 文档</span>';
+      if (mobileTitle) mobileTitle.textContent = 'Hermes Agent 文档';
+    } else if (info) {
+      var parts = info.parents.map(escapeHtml).concat([escapeHtml(info.title)]);
+      bc.innerHTML = '<a href="#/" data-page="home">首页</a>' +
+        parts.map(function (p) { return ' <span class="hd-sep">›</span> ' + p; }).join('');
+      if (mobileTitle) mobileTitle.textContent = info.title;
+    }
+
+    // Pager (prev / next)
+    var pager = document.getElementById('hd-pager');
+    pager.innerHTML = '';
+    if (id !== 'home') {
+      var idx = orderedIds.indexOf(id);
+      if (idx >= 0) {
+        if (idx > 0) {
+          var prevId = orderedIds[idx - 1];
+          pager.innerHTML += '<a class="hd-pager-link hd-prev" href="#/' + prevId + '" data-page="' + prevId + '"><span class="hd-pager-label">← 上一页</span><span class="hd-pager-title">' + escapeHtml(pageMap[prevId].title) + '</span></a>';
+        } else {
+          pager.innerHTML += '<span></span>';
+        }
+        if (idx < orderedIds.length - 1) {
+          var nextId = orderedIds[idx + 1];
+          pager.innerHTML += '<a class="hd-pager-link hd-next" href="#/' + nextId + '" data-page="' + nextId + '"><span class="hd-pager-label">下一页 →</span><span class="hd-pager-title">' + escapeHtml(pageMap[nextId].title) + '</span></a>';
+        }
+      }
+    }
+
+    // Scroll article to top
+    window.scrollTo({ top: 0, behavior: 'auto' });
+
+    // Close mobile sidebar
+    if (window.innerWidth < 960) closeSidebar();
+  }
+
+  function idFromHash() {
+    var h = (location.hash || '').replace(/^#\/?/, '').trim();
+    if (!h || h === '/') return 'home';
+    return h;
+  }
+
+  function handleHash() { showPage(idFromHash()); }
+
+  window.addEventListener('hashchange', handleHash);
+
+  // Intercept internal links within the article so in-page anchors still work,
+  // and cross-page links update the hash.
+  article.addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-page]');
+    if (a) {
+      e.preventDefault();
+      var id = a.dataset.page;
+      if (id === idFromHash()) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        location.hash = '#/' + id;
+      }
+    }
+  });
+
+  // Breadcrumbs also delegate
+  document.getElementById('hd-breadcrumbs').addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-page]');
+    if (a) {
+      e.preventDefault();
+      location.hash = '#/' + a.dataset.page;
+    }
+  });
+
+  // ---------- Mobile sidebar toggle ----------
+  var sidebar = document.getElementById('hd-sidebar');
+  var backdrop = document.getElementById('hd-backdrop');
+  function openSidebar() { sidebar.classList.add('hd-open'); backdrop.classList.add('hd-open'); }
+  function closeSidebar() { sidebar.classList.remove('hd-open'); backdrop.classList.remove('hd-open'); }
+  var menuBtn = document.getElementById('hd-menu-btn');
+  var closeBtn = document.getElementById('hd-close-btn');
+  if (menuBtn) menuBtn.addEventListener('click', openSidebar);
+  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+  if (backdrop) backdrop.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSidebar(); });
+
+  // ---------- Search filter ----------
+  var searchInput = document.getElementById('hd-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      var q = searchInput.value.trim().toLowerCase();
+      var links = navEl.querySelectorAll('.hd-nav-link');
+      var anyMatch = false;
+      links.forEach(function (a) {
+        var hit = !q || a.textContent.toLowerCase().indexOf(q) !== -1;
+        a.style.display = hit ? '' : 'none';
+        if (hit) anyMatch = true;
+      });
+      // Show/hide groups based on child visibility
+      navEl.querySelectorAll('.hd-nav-group').forEach(function (g) {
+        var visibleChildren = g.querySelectorAll('.hd-nav-link:not([style*="display: none"])').length;
+        g.style.display = (visibleChildren > 0 || !q) ? '' : 'none';
+        if (q && visibleChildren > 0) {
+          g.querySelectorAll('.hd-nav-sub').forEach(function (s) { s.classList.add('hd-open'); });
+        }
+      });
+    });
+  }
+
+  // ---------- Initial load ----------
+  handleHash();
+})();
+</script>
