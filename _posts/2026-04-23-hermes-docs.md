@@ -2646,7 +2646,9 @@ hermes honcho profile         # 查看当前模型对你的"认知"</code></pre>
     <li>16GB 内存：小模型 + 云 fallback</li>
     <li>务必把 context 设 ≥ 64K（Hermes 最低要求）</li>
   </ul>
-  <pre><code>ollama run qwen2.5-coder:32b --ctx-size 65536 &amp;
+  <pre><code># 启动 Ollama（末尾的 & 表示放入后台运行，让同一个 shell 继续配置 Hermes）
+ollama run qwen2.5-coder:32b --ctx-size 65536 &amp;
+
 hermes model
 # 选 Custom endpoint: http://localhost:11434/v1  model: qwen2.5-coder:32b</code></pre>
   <p>完整基准、功耗、参数调优见 <a href="https://hermes-agent.nousresearch.com/docs/guides/local-llm-on-mac/" target="_blank" rel="noopener">英文原文</a>。</p>
