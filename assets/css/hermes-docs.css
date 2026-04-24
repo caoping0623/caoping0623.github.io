@@ -268,12 +268,14 @@
   color: #8b5a6b;
 }
 .hd-article pre {
-  /* !important is required here because the global `pre` rule in
-     assets/css/style.css uses `background: var(--color-code-bg) !important;`,
-     which would otherwise force a light background (#f0ece5) that matches
-     the text color below and make the code invisible. */
-  background: #2a2435 !important;
-  color: #f0ece5 !important;
+  /* Match the site's light code-block theme (and the original English Hermes
+     docs) rather than using a dark background. The global `pre` rule in
+     assets/css/style.css already sets `background: var(--color-code-bg)
+     !important;`, so we only need to set a readable dark text color here
+     (also with !important) so code stays visible on the light background. */
+  background: var(--hd-code-bg);
+  color: var(--hd-text) !important;
+  border: 1px solid var(--hd-border);
   padding: 1rem 1.15rem;
   border-radius: 10px;
   overflow-x: auto;
