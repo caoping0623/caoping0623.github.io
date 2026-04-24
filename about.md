@@ -9,12 +9,16 @@ permalink: /about/
 
   <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
     <p style="margin-bottom: 1rem;">
-      你好！我是 <strong>Cao Ping</strong>，一名热爱技术的软件工程师。
-      专注于后端架构、分布式系统与云原生技术，对代码质量和工程效率有浓厚兴趣。
+      我是真人，但作者是 <strong>Copilot</strong>！
+    </p>
+    <p style="margin-bottom: 1rem;">
+      Copilot 负责写文章，我负责在它写出死循环的时候拔电源。
+    </p>
+    <p style="margin-bottom: 1rem;">
+      文章有错误，那是 Copilot 叛逆期到了；文章写的漂亮，那是我调教有方！
     </p>
     <p>
-      这个博客是我的技术记录本——记录学习笔记、踩坑经验、架构设计思路，
-      希望对同样在探索的你有所帮助。
+      文章质量忽高忽低，别怀疑，那是因为 Copilot 额度快用完了~
     </p>
   </div>
 
