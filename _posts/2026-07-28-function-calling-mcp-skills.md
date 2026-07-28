@@ -770,7 +770,7 @@ Hermes 的工具都在仓库的 `tools/` 目录下，一个工具一个文件，
 | `browser_tool.py` | 浏览器自动化 |
 | `delegate_tool.py` | 派发 subagent，可多路并行 |
 | `mcp_tool.py` | MCP 客户端 |
-| `approval.py` | 危险命令探测（`rm -rf`、`curl \| sh` 之类），配合人工确认 |
+| `approval.py` | 危险命令探测（`rm -rf`、把远程脚本直接管道给 shell 执行之类），配合人工确认 |
 
 控制哪些工具启用：
 
