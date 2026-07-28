@@ -9,16 +9,16 @@ permalink: /about/
 
   <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
     <p style="margin-bottom: 1rem;">
-      我是真人，但作者是 <strong>Copilot</strong>！
+      我是真人，但作者是 <strong>AI</strong>！
     </p>
     <p style="margin-bottom: 1rem;">
-      Copilot 负责写文章，我负责在它写出死循环的时候拔电源。
+      AI 负责写文章，我负责在它写出死循环的时候拔电源。
     </p>
     <p style="margin-bottom: 1rem;">
-      文章有错误，那是 Copilot 叛逆期到了；文章写的漂亮，那是我调教有方！
+      文章有错误，那是 AI 叛逆期到了；文章写的漂亮，那是我调教有方！
     </p>
     <p>
-      文章质量忽高忽低，别怀疑，那是因为 Copilot 额度快用完了~
+      文章质量忽高忽低，别怀疑，那是因为 AI 额度快用完了~
     </p>
   </div>
 
