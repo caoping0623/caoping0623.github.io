@@ -11,10 +11,17 @@ permalink: /
   var ctx = canvas.getContext('2d');
 
   var W, H;
-  var NODE_COUNT = 32;
-  var MAX_DIST = 130;
+  var NODE_COUNT = 56;
+  var MAX_DIST = 185;
   var mouse = { x: -9999, y: -9999 };
   var nodes = [];
+
+  function desiredCount() {
+    /* denser on large screens; keep a floor so mobile still has enough edges */
+    var area = W * H;
+    var n = Math.round(area / 22000);
+    return Math.max(48, Math.min(72, n));
+  }
 
   function resize() {
     W = Math.round(window.innerWidth);
@@ -24,14 +31,14 @@ permalink: /
   }
 
   function makeNode() {
-    var big = Math.random() < 0.18;
+    var big = Math.random() < 0.16;
     return {
       x:  Math.random() * W,
       y:  Math.random() * H,
       baseR: big ? 5 + Math.random() * 3 : 2 + Math.random() * 2.5,
       r:  0,
-      vx: (Math.random() - 0.5) * 0.28,
-      vy: (Math.random() - 0.5) * 0.28,
+      vx: (Math.random() - 0.5) * 0.30,
+      vy: (Math.random() - 0.5) * 0.30,
       phase: Math.random() * Math.PI * 2,
       phaseSpeed: 0.018 + Math.random() * 0.018
     };
@@ -39,6 +46,7 @@ permalink: /
 
   function init() {
     resize();
+    NODE_COUNT = desiredCount();
     nodes = [];
     for (var i = 0; i < NODE_COUNT; i++) {
       var n = makeNode();
@@ -49,6 +57,16 @@ permalink: /
 
   window.addEventListener('resize', function () {
     resize();
+    var target = desiredCount();
+    while (nodes.length < target) {
+      var n = makeNode();
+      n.r = n.baseR;
+      nodes.push(n);
+    }
+    while (nodes.length > target) {
+      nodes.pop();
+    }
+    NODE_COUNT = target;
     nodes.forEach(function (n) {
       n.x = Math.min(n.x, W);
       n.y = Math.min(n.y, H);
@@ -101,10 +119,10 @@ permalink: /
         var mdb = dist2(b.x, b.y, mouse.x, mouse.y);
         var mInf = Math.max(0, 1 - Math.min(mda, mdb) / 100);
 
-        var alpha = (1 - d / MAX_DIST) * (0.22 + mInf * 0.45);
+        var alpha = (1 - d / MAX_DIST) * (0.32 + mInf * 0.48);
         ctx.beginPath();
         ctx.strokeStyle = 'rgba(160,136,188,' + alpha.toFixed(3) + ')';
-        ctx.lineWidth   = 0.7 + mInf * 1.1;
+        ctx.lineWidth   = 0.85 + mInf * 1.2;
         ctx.moveTo(a.x, a.y);
         ctx.lineTo(b.x, b.y);
         ctx.stroke();
