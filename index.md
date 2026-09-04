@@ -11,9 +11,12 @@ permalink: /
   var ctx = canvas.getContext('2d');
 
   var W, H;
-  /* The field is confined to a quarter disc centred on the top-right corner
-     of the viewport. Radius is 2/3 of the page width, trimmed by 20%. */
-  var RADIUS_RATIO = (2 / 3) * 0.8;
+  /* The field is a quarter disc centred on the top-right corner of the
+     viewport. Its radius reaches 2/3 of the viewport height, so it covers the
+     top two thirds of the right edge and the same distance across the top.
+     Clamped to the viewport width so a portrait screen cannot push it off
+     the left edge. */
+  var RADIUS_RATIO = 2 / 3;
   var R;
   var NODE_COUNT = 0;
   var MAX_DIST = 185;
@@ -23,16 +26,16 @@ permalink: /
   function resize() {
     W = Math.round(window.innerWidth);
     H = Math.round(window.innerHeight);
-    R = W * RADIUS_RATIO;
+    R = Math.min(H * RADIUS_RATIO, W);
     canvas.width  = W;
     canvas.height = H;
   }
 
   function desiredCount() {
-    /* One node per NODE_AREA px² of field, so density no longer drifts with
-       viewport size. Lower value = denser mesh; the cap keeps the O(n²) edge
-       pass cheap on very wide screens. */
-    var NODE_AREA = 16000;
+    /* One node per NODE_AREA px² of field. Tuned so the node count survives
+       the smaller disc unchanged, which means the mesh is correspondingly
+       tighter. Lower value = denser; the cap keeps the O(n²) edge pass cheap. */
+    var NODE_AREA = 8000;
     var area = Math.PI * R * R / 4;
     return Math.max(8, Math.min(110, Math.round(area / NODE_AREA)));
   }
@@ -77,6 +80,7 @@ permalink: /
       n.vy -= 2 * dot * ny;
     }
     if (n.x > W) { n.x = W; n.vx = -Math.abs(n.vx); }
+    if (n.x < 0) { n.x = 0; n.vx =  Math.abs(n.vx); }
     if (n.y < 0) { n.y = 0; n.vy =  Math.abs(n.vy); }
     if (n.y > H) { n.y = H; n.vy = -Math.abs(n.vy); }
   }

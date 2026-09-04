@@ -429,8 +429,8 @@ pre code {
 
 /* ===== Neural-node canvas =====
    Full-viewport element; the script itself confines the field to a quarter
-   disc centred on the top-right corner (radius = 2/3 of the page width,
-   trimmed by 20%). */
+   disc centred on the top-right corner (radius = 2/3 of the viewport
+   height, clamped to the viewport width). */
 #neuro-canvas {
   position: fixed;
   top: 0;
