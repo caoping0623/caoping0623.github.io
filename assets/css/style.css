@@ -427,7 +427,9 @@ pre code {
 }
 .toc-backdrop.toc-open { display: block; }
 
-/* ===== Neural-node canvas (homepage top-left quarter) ===== */
+/* ===== Neural-node canvas =====
+   Full-viewport element; the script itself confines the field to a quarter
+   disc centred on the top-right corner (radius = 2/3 of the page width). */
 #neuro-canvas {
   position: fixed;
   top: 0;
@@ -437,6 +439,45 @@ pre code {
   pointer-events: none;
   z-index: 0;
   opacity: 0.85;
+}
+
+/* ===== Homepage category directory =====
+   Reuses the article TOC styling. Docked at the far left on wide screens,
+   falls back to the same slide-out panel as posts when there is no room. */
+.home-toc {
+  width: 260px;
+  left: -280px;
+}
+.home-toc-cat a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.55rem;
+}
+.home-toc-cat:first-child a { margin-top: 0; }
+.home-toc-count {
+  flex: none;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-code-bg);
+  border-radius: 999px;
+  padding: 0.05rem 0.42rem;
+  line-height: 1.6;
+}
+
+@media (min-width: 1400px) {
+  .home-toc {
+    left: 0;
+    background: transparent;
+    border-right: none;
+    box-shadow: none;
+  }
+  .home-toc .toc-sidebar-header { background: var(--color-bg); }
+  .home-toc .home-toc-close { display: none; }
+  .home-toc-toggle,
+  .home-toc-backdrop { display: none !important; }
 }
 
 /* ===== Responsive ===== */

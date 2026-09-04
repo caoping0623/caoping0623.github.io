@@ -49,7 +49,5 @@ nav:
     url: "/"
   - title: "分类"
     url: "/categories/"
-  - title: "标签"
-    url: "/tags/"
   - title: "关于"
     url: "/about/"

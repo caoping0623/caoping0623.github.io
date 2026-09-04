@@ -11,30 +11,50 @@ permalink: /
   var ctx = canvas.getContext('2d');
 
   var W, H;
-  var NODE_COUNT = 56;
+  /* The field is confined to a quarter disc whose centre is the top-right
+     corner of the viewport and whose radius is 2/3 of the page width. */
+  var R;
+  var NODE_COUNT = 0;
   var MAX_DIST = 185;
   var mouse = { x: -9999, y: -9999 };
   var nodes = [];
 
-  function desiredCount() {
-    /* denser on large screens; keep a floor so mobile still has enough edges */
-    var area = W * H;
-    var n = Math.round(area / 22000);
-    return Math.max(48, Math.min(72, n));
-  }
-
   function resize() {
     W = Math.round(window.innerWidth);
     H = Math.round(window.innerHeight);
+    R = W * 2 / 3;
     canvas.width  = W;
     canvas.height = H;
   }
 
+  function desiredCount() {
+    /* Keep the node-per-pixel density identical to the old full-screen field,
+       then apply it to the (much smaller) quarter-disc area. */
+    var full = W * H;
+    var fullCount = Math.max(48, Math.min(72, Math.round(full / 22000)));
+    var density = fullCount / full;
+    var area = Math.PI * R * R / 4;
+    return Math.max(8, Math.round(density * area));
+  }
+
+  function randomPointInField() {
+    /* Rejection sampling gives a uniform spread over the visible quarter disc. */
+    var maxY = Math.min(R, H);
+    for (var i = 0; i < 40; i++) {
+      var x = W - Math.random() * R;
+      var y = Math.random() * maxY;
+      var dx = x - W;
+      if (dx * dx + y * y <= R * R) return { x: x, y: y };
+    }
+    return { x: W - R * 0.3, y: Math.min(R * 0.2, H * 0.5) };
+  }
+
   function makeNode() {
     var big = Math.random() < 0.16;
+    var p = randomPointInField();
     return {
-      x:  Math.random() * W,
-      y:  Math.random() * H,
+      x:  p.x,
+      y:  p.y,
       baseR: big ? 5 + Math.random() * 3 : 2 + Math.random() * 2.5,
       r:  0,
       vx: (Math.random() - 0.5) * 0.30,
@@ -42,6 +62,23 @@ permalink: /
       phase: Math.random() * Math.PI * 2,
       phaseSpeed: 0.018 + Math.random() * 0.018
     };
+  }
+
+  /* Bounce off the arc and off the two straight edges (x = W, y = 0). */
+  function confine(n) {
+    var dx = n.x - W, dy = n.y;
+    var d = Math.sqrt(dx * dx + dy * dy);
+    if (d > R) {
+      var nx = dx / d, ny = dy / d;
+      n.x = W + nx * R;
+      n.y = ny * R;
+      var dot = n.vx * nx + n.vy * ny;
+      n.vx -= 2 * dot * nx;
+      n.vy -= 2 * dot * ny;
+    }
+    if (n.x > W) { n.x = W; n.vx = -Math.abs(n.vx); }
+    if (n.y < 0) { n.y = 0; n.vy =  Math.abs(n.vy); }
+    if (n.y > H) { n.y = H; n.vy = -Math.abs(n.vy); }
   }
 
   function init() {
@@ -67,10 +104,7 @@ permalink: /
       nodes.pop();
     }
     NODE_COUNT = target;
-    nodes.forEach(function (n) {
-      n.x = Math.min(n.x, W);
-      n.y = Math.min(n.y, H);
-    });
+    nodes.forEach(confine);
   });
 
   window.addEventListener('mousemove', function (e) {
@@ -92,14 +126,18 @@ permalink: /
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
+    /* Clip everything to the circle; the canvas edges cut away the other
+       three quadrants, leaving exactly the top-right quarter. */
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(W, 0, R, 0, Math.PI * 2);
+    ctx.clip();
+
     /* ---- update nodes ---- */
     nodes.forEach(function (n) {
       n.x += n.vx;
       n.y += n.vy;
-      if (n.x < 0)  { n.x = 0;  n.vx *= -1; }
-      if (n.x > W)  { n.x = W;  n.vx *= -1; }
-      if (n.y < 0)  { n.y = 0;  n.vy *= -1; }
-      if (n.y > H)  { n.y = H;  n.vy *= -1; }
+      confine(n);
 
       n.phase += n.phaseSpeed;
       var mdist   = dist2(n.x, n.y, mouse.x, mouse.y);
@@ -163,11 +201,80 @@ permalink: /
       ctx.stroke();
     });
 
+    ctx.restore();
+
+    /* Faint boundary arc so the containment reads as deliberate. */
+    ctx.beginPath();
+    ctx.arc(W, 0, R, Math.PI / 2, Math.PI);
+    ctx.strokeStyle = 'rgba(180,155,200,0.16)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
     requestAnimationFrame(draw);
   }
 
   init();
   draw();
+}());
+</script>
+
+<!-- Category directory (docked on wide screens, slide-out below 1400px) -->
+<button class="toc-toggle-btn home-toc-toggle" id="home-toc-toggle" aria-label="打开文章目录">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <line x1="3" y1="12" x2="21" y2="12"/>
+    <line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+  <span class="toc-btn-label">目录</span>
+</button>
+
+<nav class="toc-sidebar home-toc" id="home-toc" aria-label="文章分类目录">
+  <div class="toc-sidebar-header">
+    <span class="toc-sidebar-title">文章目录</span>
+    <button class="toc-close-btn home-toc-close" id="home-toc-close" aria-label="关闭目录">×</button>
+  </div>
+  <ul class="toc-sidebar-list">
+    {% assign cats = site.categories | sort %}
+    {% for cat in cats %}
+    <li class="toc-item toc-h2 home-toc-cat">
+      <a href="{{ '/categories/' | relative_url }}">
+        <span>{{ cat[0] }}</span>
+        <span class="home-toc-count">{{ cat[1].size }}</span>
+      </a>
+    </li>
+    {% for post in cat[1] %}
+    <li class="toc-item toc-h3">
+      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+    </li>
+    {% endfor %}
+    {% endfor %}
+  </ul>
+</nav>
+
+<div class="toc-backdrop home-toc-backdrop" id="home-toc-backdrop"></div>
+
+<script>
+(function () {
+  var toggleBtn = document.getElementById('home-toc-toggle');
+  var sidebar   = document.getElementById('home-toc');
+  var closeBtn  = document.getElementById('home-toc-close');
+  var backdrop  = document.getElementById('home-toc-backdrop');
+
+  function openTOC()  { sidebar.classList.add('toc-open');    backdrop.classList.add('toc-open'); }
+  function closeTOC() { sidebar.classList.remove('toc-open'); backdrop.classList.remove('toc-open'); }
+
+  toggleBtn && toggleBtn.addEventListener('click', openTOC);
+  closeBtn  && closeBtn.addEventListener('click', closeTOC);
+  backdrop  && backdrop.addEventListener('click', closeTOC);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeTOC();
+  });
+
+  /* Follow a link on the narrow-screen panel and the panel should get out of the way. */
+  sidebar && sidebar.addEventListener('click', function (e) {
+    if (e.target.closest('a') && window.innerWidth < 1400) closeTOC();
+  });
 }());
 </script>
 

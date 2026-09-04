@@ -25,8 +25,7 @@ bundle exec jekyll serve --livereload
 ├── assets/css/        # 样式文件
 ├── index.md           # 首页
 ├── about.md           # 关于页
-├── categories/        # 分类页
-└── tags/              # 标签页
+└── categories/        # 分类页
 ```
 
 ## 写新文章
