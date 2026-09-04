@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
   <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
-  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
           {% for item in site.nav %}
           <li><a href="{{ item.url | relative_url }}"{% if page.url == item.url %} class="active"{% endif %}>{{ item.title }}</a></li>
           {% endfor %}
-          <li>
+          <li class="nav-search">
             <button type="button" class="nav-search-btn" id="nav-search-btn" aria-label="搜索文章" aria-expanded="false">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="7"/>
@@ -56,8 +56,10 @@
 
 <!-- Search overlay. Deliberately a sibling of .site-wrapper: kept out of the
      header so nothing in the nav reflows when it opens, and so position:fixed
-     is not captured by the header's backdrop-filter containing block. -->
-<div class="site-search" id="site-search">
+     is not captured by the header's backdrop-filter containing block. Its
+     position and width are written inline by place() from the magnifier's own
+     rect, so a stale stylesheet can never drop it into page flow. -->
+<div class="site-search" id="site-search" style="display:none">
   <div class="site-search-box">
     <svg class="site-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
       <circle cx="11" cy="11" r="7"/>
@@ -91,8 +93,36 @@ var SITE_POSTS = [
   var shown = [];      /* posts currently listed */
   var active = -1;     /* keyboard cursor into `shown` */
 
+  /* Pin the box immediately to the right of the magnifier and let it grow
+     rightward into the empty gutter. Written inline, so it does not depend on
+     the stylesheet having loaded. */
+  function place() {
+    var r = btn.getBoundingClientRect();
+    var GAP = 10, EDGE = 18, BOX_H = 38, MIN_W = 280, MAX_W = 560;
+
+    panel.style.position = 'fixed';
+
+    var left = r.right + GAP;
+    var room = window.innerWidth - left - EDGE;
+
+    if (room < MIN_W) {
+      /* No usable room beside the button: hang directly under it instead,
+         right-aligned to the button so it stays visually anchored. */
+      var w = Math.min(MAX_W, window.innerWidth - EDGE * 2);
+      panel.style.left  = Math.round(Math.max(EDGE, r.right - w)) + 'px';
+      panel.style.top   = Math.round(r.bottom + GAP) + 'px';
+      panel.style.width = Math.round(w) + 'px';
+    } else {
+      panel.style.left  = Math.round(left) + 'px';
+      panel.style.top   = Math.round(r.top + r.height / 2 - BOX_H / 2) + 'px';
+      panel.style.width = Math.round(Math.min(MAX_W, room)) + 'px';
+    }
+  }
+
   function open() {
-    panel.classList.add('open');
+    panel.style.display = 'block';
+    place();
+    requestAnimationFrame(function () { panel.classList.add('open'); });
     btn.setAttribute('aria-expanded', 'true');
     input.focus();
     input.select();
@@ -101,6 +131,7 @@ var SITE_POSTS = [
 
   function close() {
     panel.classList.remove('open');
+    panel.style.display = 'none';
     btn.setAttribute('aria-expanded', 'false');
     input.blur();
     results.classList.remove('has-results');
@@ -109,7 +140,10 @@ var SITE_POSTS = [
     active = -1;
   }
 
-  function isOpen() { return panel.classList.contains('open'); }
+  function isOpen() { return panel.style.display === 'block'; }
+
+  window.addEventListener('resize', function () { if (isOpen()) place(); });
+  window.addEventListener('scroll', function () { if (isOpen()) place(); }, { passive: true });
 
   /* Split the query into keywords; every keyword must appear in the title. */
   function keywordsOf(q) {

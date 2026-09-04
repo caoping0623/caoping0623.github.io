@@ -74,25 +74,22 @@ a:hover { color: var(--color-accent); }
 .nav-search-btn:hover { color: var(--color-text); background: var(--color-code-bg); }
 .nav-search-btn[aria-expanded="true"] { color: var(--color-primary); background: var(--color-code-bg); }
 
+/* Position and width come from place() as inline styles; this rule only
+   carries appearance and the open/close fade. */
 .site-search {
-  position: fixed;
-  top: 70px;
-  right: 1.75rem;
-  width: 560px;
-  max-width: calc(100vw - 3rem);
   z-index: 500;
   opacity: 0;
-  visibility: hidden;
-  transform: translateY(-6px);
-  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  transform: translateX(-6px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
 }
-.site-search.open { opacity: 1; visibility: visible; transform: none; }
+.site-search.open { opacity: 1; transform: none; }
 
 .site-search-box {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.55rem 0.9rem;
+  height: 38px;
+  padding: 0 0.9rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 999px;
@@ -641,7 +638,6 @@ pre code {
   .post-header h1 { font-size: 1.5rem; }
   .nav-links { gap: 1rem; }
 
-  .site-search { right: 1.5rem; left: 1.5rem; width: auto; max-width: none; }
   .site-search-item { gap: 0.75rem; padding: 0.65rem 0.85rem; }
   .site-search-meta { display: none; }
 }
