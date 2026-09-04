@@ -24,8 +24,7 @@ bundle exec jekyll serve --livereload
 ├── _posts/            # 博客文章 (YYYY-MM-DD-title.md)
 ├── assets/css/        # 样式文件
 ├── index.md           # 首页
-├── about.md           # 关于页
-└── categories/        # 分类页
+└── about.md           # 关于页
 ```
 
 ## 写新文章

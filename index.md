@@ -29,13 +29,12 @@ permalink: /
   }
 
   function desiredCount() {
-    /* Keep the node-per-pixel density identical to the old full-screen field,
-       then apply it to the (much smaller) quarter-disc area. */
-    var full = W * H;
-    var fullCount = Math.max(48, Math.min(72, Math.round(full / 22000)));
-    var density = fullCount / full;
+    /* One node per NODE_AREA px² of field, so density no longer drifts with
+       viewport size. Lower value = denser mesh; the cap keeps the O(n²) edge
+       pass cheap on very wide screens. */
+    var NODE_AREA = 16000;
     var area = Math.PI * R * R / 4;
-    return Math.max(8, Math.round(density * area));
+    return Math.max(8, Math.min(110, Math.round(area / NODE_AREA)));
   }
 
   function randomPointInField() {
