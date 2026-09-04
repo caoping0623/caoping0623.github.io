@@ -18,12 +18,24 @@
 
   <header class="site-header">
     <div class="container">
-      <nav class="nav-inner">
+      <nav class="nav-inner" id="nav-inner">
         <a href="{{ '/' | relative_url }}" class="site-logo">⚡ {{ site.title }}</a>
         <ul class="nav-links">
           {% for item in site.nav %}
           <li><a href="{{ item.url | relative_url }}"{% if page.url == item.url %} class="active"{% endif %}>{{ item.title }}</a></li>
           {% endfor %}
+          <li class="nav-search" id="nav-search">
+            <button type="button" class="nav-search-btn" id="nav-search-btn" aria-label="搜索文章" aria-expanded="false">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"/>
+                <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+              </svg>
+            </button>
+            <input type="text" class="nav-search-input" id="nav-search-input"
+                   placeholder="搜索文章标题…" autocomplete="off" spellcheck="false"
+                   aria-label="按标题搜索文章" tabindex="-1">
+            <div class="nav-search-results" id="nav-search-results" role="listbox"></div>
+          </li>
         </ul>
       </nav>
     </div>
@@ -45,5 +57,190 @@
   </footer>
 
 </div>
+
+<script>
+/* Title index, newest first. Small enough to inline; no plugin needed. */
+var SITE_POSTS = [
+{%- for post in site.posts %}
+  { t: {{ post.title | jsonify }}, u: {{ post.url | relative_url | jsonify }}, c: {{ post.categories | first | default: "" | jsonify }}, d: {{ post.date | date: "%Y-%m-%d" | jsonify }} }{% unless forloop.last %},{% endunless %}
+{%- endfor %}
+];
+
+(function () {
+  var wrap    = document.getElementById('nav-search');
+  var navBar  = document.getElementById('nav-inner');
+  var btn     = document.getElementById('nav-search-btn');
+  var input   = document.getElementById('nav-search-input');
+  var results = document.getElementById('nav-search-results');
+  if (!wrap || !btn || !input || !results) return;
+
+  var MAX_SHOWN = 8;
+  var shown = [];      /* posts currently listed */
+  var active = -1;     /* keyboard cursor into `shown` */
+
+  function open() {
+    navBar.classList.add('search-open');
+    btn.setAttribute('aria-expanded', 'true');
+    input.tabIndex = 0;
+    input.focus();
+    if (input.value.trim()) update();
+  }
+
+  function close() {
+    navBar.classList.remove('search-open');
+    btn.setAttribute('aria-expanded', 'false');
+    input.tabIndex = -1;
+    input.blur();
+    results.classList.remove('has-results');
+    results.innerHTML = '';
+    shown = [];
+    active = -1;
+  }
+
+  function isOpen() { return navBar.classList.contains('search-open'); }
+
+  /* Split the query into keywords; every keyword must appear in the title. */
+  function keywordsOf(q) {
+    return q.toLowerCase().split(/\s+/).filter(function (k) { return k.length > 0; });
+  }
+
+  function match(keys) {
+    var hits = [];
+    for (var i = 0; i < SITE_POSTS.length; i++) {
+      var p = SITE_POSTS[i];
+      var lower = p.t.toLowerCase();
+      var ok = true;
+      for (var j = 0; j < keys.length; j++) {
+        if (lower.indexOf(keys[j]) === -1) { ok = false; break; }
+      }
+      if (ok) hits.push({ p: p, at: lower.indexOf(keys[0]) });
+    }
+    /* Earlier match first; SITE_POSTS order (newest first) breaks ties. */
+    hits.sort(function (a, b) { return a.at - b.at; });
+    return hits.map(function (h) { return h.p; });
+  }
+
+  /* Build text nodes + <mark> by hand so titles are never parsed as HTML. */
+  function highlight(el, text, keys) {
+    var lower = text.toLowerCase();
+    var spans = [];
+    keys.forEach(function (k) {
+      var from = 0, at;
+      while ((at = lower.indexOf(k, from)) !== -1) {
+        spans.push([at, at + k.length]);
+        from = at + k.length;
+      }
+    });
+    spans.sort(function (a, b) { return a[0] - b[0]; });
+    var merged = [];
+    spans.forEach(function (s) {
+      var last = merged[merged.length - 1];
+      if (last && s[0] <= last[1]) last[1] = Math.max(last[1], s[1]);
+      else merged.push([s[0], s[1]]);
+    });
+    var pos = 0;
+    merged.forEach(function (s) {
+      if (s[0] > pos) el.appendChild(document.createTextNode(text.slice(pos, s[0])));
+      var mk = document.createElement('mark');
+      mk.textContent = text.slice(s[0], s[1]);
+      el.appendChild(mk);
+      pos = s[1];
+    });
+    if (pos < text.length) el.appendChild(document.createTextNode(text.slice(pos)));
+  }
+
+  function setActive(i) {
+    active = i;
+    var items = results.querySelectorAll('.nav-search-item');
+    for (var k = 0; k < items.length; k++) {
+      items[k].classList.toggle('is-active', k === i);
+    }
+    if (i >= 0 && items[i]) items[i].scrollIntoView({ block: 'nearest' });
+  }
+
+  function update() {
+    var q = input.value.trim();
+    var keys = keywordsOf(q);
+    results.innerHTML = '';
+    active = -1;
+
+    if (!keys.length) {
+      shown = [];
+      results.classList.remove('has-results');
+      return;
+    }
+
+    var hits = match(keys);
+    shown = hits.slice(0, MAX_SHOWN);
+    results.classList.add('has-results');
+
+    if (!hits.length) {
+      var empty = document.createElement('p');
+      empty.className = 'nav-search-empty';
+      empty.textContent = '没有标题匹配「' + q + '」';
+      results.appendChild(empty);
+      return;
+    }
+
+    shown.forEach(function (p) {
+      var a = document.createElement('a');
+      a.className = 'nav-search-item';
+      a.href = p.u;
+      a.setAttribute('role', 'option');
+
+      var title = document.createElement('span');
+      title.className = 'nav-search-title';
+      highlight(title, p.t, keys);
+
+      var meta = document.createElement('span');
+      meta.className = 'nav-search-meta';
+      meta.textContent = (p.c ? p.c + ' · ' : '') + p.d;
+
+      a.appendChild(title);
+      a.appendChild(meta);
+      results.appendChild(a);
+    });
+
+    if (hits.length > shown.length) {
+      var more = document.createElement('p');
+      more.className = 'nav-search-more';
+      more.textContent = '另有 ' + (hits.length - shown.length) + ' 篇匹配，继续输入以缩小范围';
+      results.appendChild(more);
+    }
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    isOpen() ? close() : open();
+  });
+
+  input.addEventListener('input', update);
+  input.addEventListener('click', function (e) { e.stopPropagation(); });
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { close(); return; }
+    if (!shown.length) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActive((active + 1) % shown.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActive((active - 1 + shown.length) % shown.length);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      window.location.href = shown[active >= 0 ? active : 0].u;
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    if (isOpen() && !wrap.contains(e.target)) close();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen()) close();
+  });
+}());
+</script>
 </body>
 </html>
