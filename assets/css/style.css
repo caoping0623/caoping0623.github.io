@@ -55,8 +55,11 @@ a:hover { color: var(--color-accent); }
 .nav-links a { color: var(--color-text-muted); font-size: 0.9rem; font-weight: 500; }
 .nav-links a:hover, .nav-links a.active { color: var(--color-text); }
 
-/* ===== Nav search ===== */
-.nav-search { position: relative; display: flex; align-items: center; }
+/* ===== Site search =====
+   The trigger lives in the nav but is a fixed-size button, so nothing in the
+   header ever reflows. The panel is a fixed overlay pinned to the right edge
+   of the viewport, which also lets it use the empty space beside the
+   860px-wide content column instead of crowding the middle. */
 .nav-search-btn {
   display: flex;
   align-items: center;
@@ -69,83 +72,110 @@ a:hover { color: var(--color-accent); }
   transition: color var(--transition), background var(--transition);
 }
 .nav-search-btn:hover { color: var(--color-text); background: var(--color-code-bg); }
-.search-open .nav-search-btn { color: var(--color-primary); }
+.nav-search-btn[aria-expanded="true"] { color: var(--color-primary); background: var(--color-code-bg); }
 
-.nav-search-input {
-  width: 0;
-  padding: 0;
-  margin-left: 0;
-  border: 1px solid transparent;
-  border-radius: 999px;
+.site-search {
+  position: fixed;
+  top: 70px;
+  right: 1.75rem;
+  width: 560px;
+  max-width: calc(100vw - 3rem);
+  z-index: 500;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+.site-search.open { opacity: 1; visibility: visible; transform: none; }
+
+.site-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.9rem;
   background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+.site-search-icon { flex: none; color: var(--color-text-muted); }
+.site-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
   color: var(--color-text);
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   line-height: 1.6;
-  opacity: 0;
-  pointer-events: none;
-  transition: width 0.25s ease, opacity 0.2s ease, padding 0.25s ease, margin 0.25s ease;
 }
-.nav-search-input::placeholder { color: var(--color-text-muted); }
-.nav-search-input:focus { outline: none; border-color: var(--color-primary); }
-.search-open .nav-search-input {
-  width: 210px;
-  padding: 0.3rem 0.85rem;
-  margin-left: 0.4rem;
-  border-color: var(--color-border);
-  opacity: 1;
-  pointer-events: auto;
+.site-search-input::placeholder { color: var(--color-text-muted); }
+.site-search-input:focus { outline: none; }
+.site-search-close {
+  flex: none;
+  padding: 0 0.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  border-radius: 5px;
+  transition: color var(--transition), background var(--transition);
 }
+.site-search-close:hover { color: var(--color-text); background: var(--color-code-bg); }
 
-.nav-search-results {
+.site-search-results {
   display: none;
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  width: 340px;
-  max-height: 60vh;
+  margin-top: 0.55rem;
+  max-height: 62vh;
   overflow-y: auto;
-  padding: 0.4rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  z-index: 400;
 }
-.nav-search-results.has-results { display: block; }
+.site-search-results.has-results { display: block; }
 
-.nav-search-item {
-  display: block;
-  padding: 0.5rem 0.7rem;
-  border-radius: 9px;
+/* One article per row: title on a single line, meta pinned right. */
+.site-search-item {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.7rem 1rem;
   transition: background var(--transition);
 }
-.nav-search-item:hover, .nav-search-item.is-active { background: rgba(180,155,200,0.12); }
-.nav-search-title {
-  display: block;
-  font-size: 0.86rem;
+.site-search-item + .site-search-item { border-top: 1px solid var(--color-border); }
+.site-search-item:hover, .site-search-item.is-active { background: rgba(180,155,200,0.12); }
+.site-search-title {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.89rem;
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--color-text);
 }
-.nav-search-title mark {
-  background: rgba(122,184,181,0.28);
+.site-search-title mark {
+  background: rgba(122,184,181,0.3);
   color: inherit;
   border-radius: 3px;
   padding: 0 1px;
 }
-.nav-search-meta {
-  display: block;
-  margin-top: 0.15rem;
-  font-size: 0.72rem;
+.site-search-meta {
+  flex: none;
+  font-size: 0.73rem;
   color: var(--color-text-muted);
+  white-space: nowrap;
 }
-.nav-search-empty, .nav-search-more {
-  padding: 0.6rem 0.7rem;
+.site-search-empty, .site-search-more {
+  padding: 0.75rem 1rem;
   font-size: 0.78rem;
   color: var(--color-text-muted);
 }
-.nav-search-more { border-top: 1px solid var(--color-border); margin-top: 0.3rem; }
+.site-search-more { border-top: 1px solid var(--color-border); }
 
 /* ===== Hero ===== */
 .hero {
@@ -611,11 +641,7 @@ pre code {
   .post-header h1 { font-size: 1.5rem; }
   .nav-links { gap: 1rem; }
 
-  /* Give the input the whole bar: the logo and links step aside while open. */
-  .nav-inner.search-open .site-logo { display: none; }
-  .nav-inner.search-open .nav-links > li:not(.nav-search) { display: none; }
-  .nav-inner.search-open .nav-links { width: 100%; }
-  .nav-inner.search-open .nav-search { flex: 1; }
-  .nav-inner.search-open .nav-search-input { flex: 1; width: auto; }
-  .nav-search-results { width: calc(100vw - 3rem); }
+  .site-search { right: 1.5rem; left: 1.5rem; width: auto; max-width: none; }
+  .site-search-item { gap: 0.75rem; padding: 0.65rem 0.85rem; }
+  .site-search-meta { display: none; }
 }

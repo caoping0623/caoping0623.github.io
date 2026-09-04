@@ -24,17 +24,13 @@
           {% for item in site.nav %}
           <li><a href="{{ item.url | relative_url }}"{% if page.url == item.url %} class="active"{% endif %}>{{ item.title }}</a></li>
           {% endfor %}
-          <li class="nav-search" id="nav-search">
+          <li>
             <button type="button" class="nav-search-btn" id="nav-search-btn" aria-label="搜索文章" aria-expanded="false">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="7"/>
                 <line x1="16.5" y1="16.5" x2="21" y2="21"/>
               </svg>
             </button>
-            <input type="text" class="nav-search-input" id="nav-search-input"
-                   placeholder="搜索文章标题…" autocomplete="off" spellcheck="false"
-                   aria-label="按标题搜索文章" tabindex="-1">
-            <div class="nav-search-results" id="nav-search-results" role="listbox"></div>
           </li>
         </ul>
       </nav>
@@ -58,6 +54,23 @@
 
 </div>
 
+<!-- Search overlay. Deliberately a sibling of .site-wrapper: kept out of the
+     header so nothing in the nav reflows when it opens, and so position:fixed
+     is not captured by the header's backdrop-filter containing block. -->
+<div class="site-search" id="site-search">
+  <div class="site-search-box">
+    <svg class="site-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"/>
+      <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+    </svg>
+    <input type="text" class="site-search-input" id="site-search-input"
+           placeholder="搜索文章标题…" autocomplete="off" spellcheck="false"
+           aria-label="按标题搜索文章">
+    <button type="button" class="site-search-close" id="site-search-close" aria-label="关闭搜索">×</button>
+  </div>
+  <div class="site-search-results" id="site-search-results" role="listbox"></div>
+</div>
+
 <script>
 /* Title index, newest first. Small enough to inline; no plugin needed. */
 var SITE_POSTS = [
@@ -67,29 +80,28 @@ var SITE_POSTS = [
 ];
 
 (function () {
-  var wrap    = document.getElementById('nav-search');
-  var navBar  = document.getElementById('nav-inner');
-  var btn     = document.getElementById('nav-search-btn');
-  var input   = document.getElementById('nav-search-input');
-  var results = document.getElementById('nav-search-results');
-  if (!wrap || !btn || !input || !results) return;
+  var panel    = document.getElementById('site-search');
+  var btn      = document.getElementById('nav-search-btn');
+  var closeBtn = document.getElementById('site-search-close');
+  var input    = document.getElementById('site-search-input');
+  var results  = document.getElementById('site-search-results');
+  if (!panel || !btn || !input || !results) return;
 
-  var MAX_SHOWN = 8;
+  var MAX_SHOWN = 10;
   var shown = [];      /* posts currently listed */
   var active = -1;     /* keyboard cursor into `shown` */
 
   function open() {
-    navBar.classList.add('search-open');
+    panel.classList.add('open');
     btn.setAttribute('aria-expanded', 'true');
-    input.tabIndex = 0;
     input.focus();
+    input.select();
     if (input.value.trim()) update();
   }
 
   function close() {
-    navBar.classList.remove('search-open');
+    panel.classList.remove('open');
     btn.setAttribute('aria-expanded', 'false');
-    input.tabIndex = -1;
     input.blur();
     results.classList.remove('has-results');
     results.innerHTML = '';
@@ -97,7 +109,7 @@ var SITE_POSTS = [
     active = -1;
   }
 
-  function isOpen() { return navBar.classList.contains('search-open'); }
+  function isOpen() { return panel.classList.contains('open'); }
 
   /* Split the query into keywords; every keyword must appear in the title. */
   function keywordsOf(q) {
@@ -151,7 +163,7 @@ var SITE_POSTS = [
 
   function setActive(i) {
     active = i;
-    var items = results.querySelectorAll('.nav-search-item');
+    var items = results.querySelectorAll('.site-search-item');
     for (var k = 0; k < items.length; k++) {
       items[k].classList.toggle('is-active', k === i);
     }
@@ -176,24 +188,26 @@ var SITE_POSTS = [
 
     if (!hits.length) {
       var empty = document.createElement('p');
-      empty.className = 'nav-search-empty';
+      empty.className = 'site-search-empty';
       empty.textContent = '没有标题匹配「' + q + '」';
       results.appendChild(empty);
       return;
     }
 
+    /* One row per article: title on a single line, meta pinned to the right. */
     shown.forEach(function (p) {
       var a = document.createElement('a');
-      a.className = 'nav-search-item';
+      a.className = 'site-search-item';
       a.href = p.u;
       a.setAttribute('role', 'option');
+      a.title = p.t;
 
       var title = document.createElement('span');
-      title.className = 'nav-search-title';
+      title.className = 'site-search-title';
       highlight(title, p.t, keys);
 
       var meta = document.createElement('span');
-      meta.className = 'nav-search-meta';
+      meta.className = 'site-search-meta';
       meta.textContent = (p.c ? p.c + ' · ' : '') + p.d;
 
       a.appendChild(title);
@@ -203,7 +217,7 @@ var SITE_POSTS = [
 
     if (hits.length > shown.length) {
       var more = document.createElement('p');
-      more.className = 'nav-search-more';
+      more.className = 'site-search-more';
       more.textContent = '另有 ' + (hits.length - shown.length) + ' 篇匹配，继续输入以缩小范围';
       results.appendChild(more);
     }
@@ -214,8 +228,9 @@ var SITE_POSTS = [
     isOpen() ? close() : open();
   });
 
+  closeBtn && closeBtn.addEventListener('click', close);
+
   input.addEventListener('input', update);
-  input.addEventListener('click', function (e) { e.stopPropagation(); });
 
   input.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { close(); return; }
@@ -234,7 +249,7 @@ var SITE_POSTS = [
   });
 
   document.addEventListener('click', function (e) {
-    if (isOpen() && !wrap.contains(e.target)) close();
+    if (isOpen() && !panel.contains(e.target) && !btn.contains(e.target)) close();
   });
 
   document.addEventListener('keydown', function (e) {
