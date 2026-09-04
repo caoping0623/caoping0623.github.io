@@ -429,7 +429,8 @@ pre code {
 
 /* ===== Neural-node canvas =====
    Full-viewport element; the script itself confines the field to a quarter
-   disc centred on the top-right corner (radius = 2/3 of the page width). */
+   disc centred on the top-right corner (radius = 2/3 of the page width,
+   trimmed by 20%). */
 #neuro-canvas {
   position: fixed;
   top: 0;
@@ -448,14 +449,42 @@ pre code {
   width: 260px;
   left: -280px;
 }
-.home-toc-cat a {
+.home-toc-list, .home-toc-sub { list-style: none; margin: 0; padding: 0; }
+.home-toc-list { padding: 0.75rem 0 1.5rem; }
+.home-toc-group + .home-toc-group { margin-top: 0.15rem; }
+
+/* Category row: a toggle, not a link. */
+.home-toc-cat {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.6rem;
-  margin-top: 0.55rem;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 1.25rem;
+  background: none;
+  border: none;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--color-text);
+  text-align: left;
+  transition: color var(--transition), background var(--transition);
 }
-.home-toc-cat:first-child a { margin-top: 0; }
+.home-toc-cat:hover {
+  color: var(--color-primary-light);
+  background: rgba(180,155,200,0.08);
+  border-left-color: var(--color-primary);
+}
+.home-toc-caret {
+  flex: none;
+  color: var(--color-text-muted);
+  transition: transform 0.2s ease;
+}
+.home-toc-cat[aria-expanded="true"] { color: var(--color-primary-light); }
+.home-toc-cat[aria-expanded="true"] .home-toc-caret { transform: rotate(90deg); }
+.home-toc-name { flex: 1; }
 .home-toc-count {
   flex: none;
   font-size: 0.68rem;
@@ -466,6 +495,10 @@ pre code {
   padding: 0.05rem 0.42rem;
   line-height: 1.6;
 }
+
+/* Sub-list is collapsed until its own toggle says otherwise. */
+.home-toc-sub { display: none; padding-bottom: 0.3rem; }
+.home-toc-cat[aria-expanded="true"] + .home-toc-sub { display: block; }
 
 @media (min-width: 1400px) {
   .home-toc {

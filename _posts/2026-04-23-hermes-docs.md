@@ -2,7 +2,7 @@
 title: "Hermes Docs（官方文档简体中文版）"
 date: 2026-04-23
 layout: hermes-docs
-categories: [人工智能]
+categories: [AI]
 tags: [Hermes, Nous Research, AI Agent, 中文文档, MCP, Skills, 翻译]
 excerpt: "Nous Research 出品的 Hermes Agent 官方文档（https://hermes-agent.nousresearch.com/docs/）简体中文版。左侧为完整目录树，右侧为对应页面内容；支持目录点击切换、文档内跨页跳转、URL hash 深链接。"
 permalink: /hermes-docs/

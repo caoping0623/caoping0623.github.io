@@ -11,8 +11,9 @@ permalink: /
   var ctx = canvas.getContext('2d');
 
   var W, H;
-  /* The field is confined to a quarter disc whose centre is the top-right
-     corner of the viewport and whose radius is 2/3 of the page width. */
+  /* The field is confined to a quarter disc centred on the top-right corner
+     of the viewport. Radius is 2/3 of the page width, trimmed by 20%. */
+  var RADIUS_RATIO = (2 / 3) * 0.8;
   var R;
   var NODE_COUNT = 0;
   var MAX_DIST = 185;
@@ -22,7 +23,7 @@ permalink: /
   function resize() {
     W = Math.round(window.innerWidth);
     H = Math.round(window.innerHeight);
-    R = W * 2 / 3;
+    R = W * RADIUS_RATIO;
     canvas.width  = W;
     canvas.height = H;
   }
@@ -233,20 +234,25 @@ permalink: /
     <span class="toc-sidebar-title">文章目录</span>
     <button class="toc-close-btn home-toc-close" id="home-toc-close" aria-label="关闭目录">×</button>
   </div>
-  <ul class="toc-sidebar-list">
+  <ul class="toc-sidebar-list home-toc-list">
     {% assign cats = site.categories | sort %}
     {% for cat in cats %}
-    <li class="toc-item toc-h2 home-toc-cat">
-      <a href="{{ '/categories/' | relative_url }}">
-        <span>{{ cat[0] }}</span>
+    <li class="home-toc-group">
+      <button type="button" class="home-toc-cat" aria-expanded="false">
+        <svg class="home-toc-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="9 6 15 12 9 18"/>
+        </svg>
+        <span class="home-toc-name">{{ cat[0] }}</span>
         <span class="home-toc-count">{{ cat[1].size }}</span>
-      </a>
+      </button>
+      <ul class="home-toc-sub">
+        {% for post in cat[1] %}
+        <li class="toc-item toc-h3">
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        </li>
+        {% endfor %}
+      </ul>
     </li>
-    {% for post in cat[1] %}
-    <li class="toc-item toc-h3">
-      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-    </li>
-    {% endfor %}
     {% endfor %}
   </ul>
 </nav>
@@ -274,6 +280,14 @@ permalink: /
   /* Follow a link on the narrow-screen panel and the panel should get out of the way. */
   sidebar && sidebar.addEventListener('click', function (e) {
     if (e.target.closest('a') && window.innerWidth < 1400) closeTOC();
+  });
+
+  /* Categories start collapsed; CSS reveals the sub-list from aria-expanded. */
+  sidebar && sidebar.querySelectorAll('.home-toc-cat').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+    });
   });
 }());
 </script>

@@ -1,7 +1,7 @@
 ---
 title: "知识库"
 date: 2026-04-16
-categories: [人工智能]
+categories: [AI]
 tags: [知识库, RAG, Agent, 向量数据库, Qwen, 本地部署]
 excerpt: "从零认识 Agent 知识库：涵盖知识库类型、核心技术（Embedding / 向量检索 / RAG）、主流搭建方案对比，以及基于本地 Qwen + VSCode + Copilot 的实战搭建全流程。"
 ---

@@ -1,7 +1,7 @@
 ---
 title: "AI 里的 Harness：别再只调模型，先把「测试架」搭好"
 date: 2026-07-30
-categories: [人工智能]
+categories: [AI]
 tags: [Harness, Agent, 测试, SIL, HIL, 车载, MCP, Skills, Cursor, 工程实践]
 excerpt: "Harness 不是玄学新词。对车载工程师来说，它很像 SIL/HIL 里的测试架：模型是被测件，harness 是周围那一整套夹具、激励、观测、权限和回放。本文用直白例子讲清 Agent Harness、Eval Harness 和 Harness Engineering，并说明车载开发里哪些地方现在就能用、哪些地方必须加安全闸门。"
 ---

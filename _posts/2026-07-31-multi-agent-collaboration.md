@@ -1,7 +1,7 @@
 ---
 title: "多个 Agent 怎么一起干活？协作交互一次讲明白"
 date: 2026-07-31
-categories: [人工智能]
+categories: [AI]
 tags: [AI Agent, 多智能体, Multi-Agent, CrewAI, LangGraph, AutoGen, MCP, A2A, 协作]
 excerpt: "从「一个人干所有活」到「一个小团队分工」，讲清多 Agent 协作的本质、五种常见组织方式、它们如何传消息/共享状态/交接任务，并用「周末出游计划」走完一轮完整交互；文末附 GitHub 开源框架索引，方便对照上手。"
 ---

@@ -1,7 +1,7 @@
 ---
 title: "Hermes 框架深度解析（基于源码）"
 date: 2026-04-21
-categories: [人工智能]
+categories: [AI]
 tags: [Hermes, AI Agent, Nous Research, Skills, MCP, Qwen, 办公自动化]
 excerpt: "严格对照 https://github.com/NousResearch/hermes-agent 源码，重新梳理 Hermes Agent 的真实定位、目录结构、学习闭环、skills/ 目录下全部 25 个类目的用途，以及日常办公可以直接落地的使用场景。"
 ---

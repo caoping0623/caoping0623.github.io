@@ -1,7 +1,7 @@
 ---
 title: "WorkBuddy 入门：腾讯桌面 AI Agent 的简介与使用方法"
 date: 2026-07-30
-categories: [人工智能]
+categories: [AI]
 tags: [WorkBuddy, AI Agent, MCP, Skills, 办公自动化, 腾讯]
 excerpt: "WorkBuddy 不是又一个聊天机器人，而是腾讯推出的全场景职场 AI 智能体桌面工作台：一句话下达任务，它会自主拆解、操作本地文件、调用连接器，并交付可验收的文档、表格或 PPT。本文讲清它是什么、和传统 AI 对话差在哪、怎么安装上手，以及 Skill、连接器、自动化怎么用。"
 ---

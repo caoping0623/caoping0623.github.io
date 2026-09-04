@@ -1,7 +1,7 @@
 ---
 title: "把 Function Calling、MCP、Skills、Plugin 一次讲清楚"
 date: 2026-07-28
-categories: [人工智能]
+categories: [AI]
 tags: [Function Calling, MCP, Skills, Plugin, DeepSeek Harness, AI Agent, Cursor, Hermes, 工具调用]
 excerpt: "这几个词经常被混着说，但它们处在完全不同的层次上：Function Calling 是模型的能力，MCP 是工具的接口协议，Skills 是给 Agent 的操作手册，而 DeepSeek Harness 带火的 Plugin 是把 Agent 本身拆成可替换零件。本文从零讲起，每个概念配一个能跑的例子，讲清区别、讲清怎么搭配，并给出在 Cursor、Hermes Agent 和 dsh 里的真实配置方法。"
 ---
