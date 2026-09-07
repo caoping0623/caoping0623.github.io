@@ -305,7 +305,10 @@ permalink: /
   <h2 class="section-heading">最新文章</h2>
 
   <div class="post-grid">
-    {% for post in site.posts limit:10 %}
+    {% assign shown = 0 %}
+    {% for post in site.posts %}
+      {% if post.categories contains '财经' %}{% continue %}{% endif %}
+      {% if shown >= 10 %}{% break %}{% endif %}
     <article class="post-card">
       <div class="post-card-meta">
         {% if post.categories.size > 0 %}
@@ -325,6 +328,7 @@ permalink: /
       </div>
       {% endif %}
     </article>
+      {% assign shown = shown | plus: 1 %}
     {% endfor %}
   </div>
 
