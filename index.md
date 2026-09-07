@@ -239,15 +239,36 @@ permalink: /
   </div>
   <ul class="toc-sidebar-list home-toc-list">
     {% assign cats = site.categories | sort %}
+    {% assign lock_cat = site.finance_lock.category | default: '私人' %}
     {% for cat in cats %}
-    <li class="home-toc-group">
-      <button type="button" class="home-toc-cat" aria-expanded="false">
+    {% assign is_private = false %}
+    {% if site.finance_lock.enabled and cat[0] == lock_cat %}
+      {% assign is_private = true %}
+    {% endif %}
+    <li class="home-toc-group{% if is_private %} home-toc-private{% endif %}">
+      <button type="button" class="home-toc-cat" aria-expanded="false"{% if is_private %} data-private="true"{% endif %}>
         <svg class="home-toc-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <polyline points="9 6 15 12 9 18"/>
         </svg>
         <span class="home-toc-name">{{ cat[0] }}</span>
+        {% if is_private %}
+        <svg class="home-toc-lock-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="10" rx="2"/>
+          <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+        </svg>
+        {% endif %}
         <span class="home-toc-count">{{ cat[1].size }}</span>
       </button>
+      {% if is_private %}
+      <div class="home-toc-gate" hidden>
+        <form class="home-toc-gate-form" autocomplete="off">
+          <input type="password" class="home-toc-gate-input" placeholder="输入密码展开" required autocomplete="current-password">
+          <button type="submit" class="home-toc-gate-btn">解锁</button>
+        </form>
+        <p class="home-toc-gate-error" hidden>密码不对</p>
+      </div>
+      <ul class="home-toc-sub" data-private-posts='[{% for post in cat[1] %}{"t":{{ post.title | jsonify }},"u":{{ post.url | relative_url | jsonify }}}{% unless forloop.last %},{% endunless %}{% endfor %}]'></ul>
+      {% else %}
       <ul class="home-toc-sub">
         {% for post in cat[1] %}
         <li class="toc-item toc-h3">
@@ -255,6 +276,7 @@ permalink: /
         </li>
         {% endfor %}
       </ul>
+      {% endif %}
     </li>
     {% endfor %}
   </ul>
@@ -268,6 +290,8 @@ permalink: /
   var sidebar   = document.getElementById('home-toc');
   var closeBtn  = document.getElementById('home-toc-close');
   var backdrop  = document.getElementById('home-toc-backdrop');
+  var HASH = {{ site.finance_lock.password_hash | jsonify }};
+  var KEY = 'private-toc-unlocked';
 
   function openTOC()  { sidebar.classList.add('toc-open');    backdrop.classList.add('toc-open'); }
   function closeTOC() { sidebar.classList.remove('toc-open'); backdrop.classList.remove('toc-open'); }
@@ -280,16 +304,102 @@ permalink: /
     if (e.key === 'Escape') closeTOC();
   });
 
-  /* Follow a link on the narrow-screen panel and the panel should get out of the way. */
   sidebar && sidebar.addEventListener('click', function (e) {
     if (e.target.closest('a') && window.innerWidth < 1400) closeTOC();
   });
 
-  /* Categories start collapsed; CSS reveals the sub-list from aria-expanded. */
+  function hex(buf) {
+    return Array.from(new Uint8Array(buf)).map(function (b) {
+      return b.toString(16).padStart(2, '0');
+    }).join('');
+  }
+
+  function sha256(text) {
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(hex);
+  }
+
+  function fillPrivateList(ul) {
+    if (!ul || ul.getAttribute('data-filled') === '1') return;
+    var raw = ul.getAttribute('data-private-posts') || '[]';
+    var posts;
+    try { posts = JSON.parse(raw); } catch (e) { posts = []; }
+    ul.innerHTML = '';
+    posts.forEach(function (p) {
+      var li = document.createElement('li');
+      li.className = 'toc-item toc-h3';
+      var a = document.createElement('a');
+      a.href = p.u;
+      a.textContent = p.t;
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+    ul.setAttribute('data-filled', '1');
+    ul.removeAttribute('data-private-posts');
+  }
+
+  function unlockGroup(group) {
+    var btn = group.querySelector('.home-toc-cat');
+    var gate = group.querySelector('.home-toc-gate');
+    var sub = group.querySelector('.home-toc-sub');
+    var icon = group.querySelector('.home-toc-lock-icon');
+    fillPrivateList(sub);
+    if (gate) gate.hidden = true;
+    if (icon) icon.hidden = true;
+    if (btn) {
+      btn.setAttribute('aria-expanded', 'true');
+      btn.removeAttribute('data-private');
+    }
+    sessionStorage.setItem(KEY, '1');
+  }
+
+  function isSessionUnlocked() {
+    return sessionStorage.getItem(KEY) === '1';
+  }
+
   sidebar && sidebar.querySelectorAll('.home-toc-cat').forEach(function (btn) {
+    var group = btn.closest('.home-toc-group');
+    var gate = group && group.querySelector('.home-toc-gate');
+    var form = gate && gate.querySelector('.home-toc-gate-form');
+    var input = gate && gate.querySelector('.home-toc-gate-input');
+    var err = gate && gate.querySelector('.home-toc-gate-error');
+    var sub = group && group.querySelector('.home-toc-sub');
+
+    if (btn.getAttribute('data-private') === 'true' && isSessionUnlocked()) {
+      unlockGroup(group);
+    }
+
     btn.addEventListener('click', function () {
       var expanded = btn.getAttribute('aria-expanded') === 'true';
+      var needsLock = btn.getAttribute('data-private') === 'true';
+
+      if (needsLock && !isSessionUnlocked()) {
+        if (gate) {
+          gate.hidden = !gate.hidden;
+          if (!gate.hidden && input) input.focus();
+        }
+        return;
+      }
+
+      if (needsLock && isSessionUnlocked()) {
+        fillPrivateList(sub);
+        btn.removeAttribute('data-private');
+      }
+
       btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      if (gate) gate.hidden = true;
+    });
+
+    form && form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (err) err.hidden = true;
+      sha256(input.value).then(function (h) {
+        if (h === HASH) {
+          unlockGroup(group);
+        } else if (err) {
+          err.hidden = false;
+          input.select();
+        }
+      });
     });
   });
 }());
@@ -306,8 +416,9 @@ permalink: /
 
   <div class="post-grid">
     {% assign shown = 0 %}
+    {% assign hide_cat = site.finance_lock.category | default: '私人' %}
     {% for post in site.posts %}
-      {% if post.categories contains '财经' %}{% continue %}{% endif %}
+      {% if post.categories contains hide_cat %}{% continue %}{% endif %}
       {% if shown >= 10 %}{% break %}{% endif %}
     <article class="post-card">
       <div class="post-card-meta">

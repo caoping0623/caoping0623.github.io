@@ -76,8 +76,13 @@
 <script>
 /* Title index, newest first. Small enough to inline; no plugin needed. */
 var SITE_POSTS = [
+{%- assign first_public = true %}
 {%- for post in site.posts %}
-  { t: {{ post.title | jsonify }}, u: {{ post.url | relative_url | jsonify }}, c: {{ post.categories | first | default: "" | jsonify }}, d: {{ post.date | date: "%Y-%m-%d" | jsonify }} }{% unless forloop.last %},{% endunless %}
+{%- if site.finance_lock.enabled and post.categories contains site.finance_lock.category %}
+{%- else %}
+{%- unless first_public %},{% endunless %}{%- assign first_public = false %}
+  { t: {{ post.title | jsonify }}, u: {{ post.url | relative_url | jsonify }}, c: {{ post.categories | first | default: "" | jsonify }}, d: {{ post.date | date: "%Y-%m-%d" | jsonify }} }
+{%- endif %}
 {%- endfor %}
 ];
 

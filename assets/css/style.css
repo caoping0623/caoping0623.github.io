@@ -619,82 +619,49 @@ pre code {
 .home-toc-sub { display: none; padding-bottom: 0.3rem; }
 .home-toc-cat[aria-expanded="true"] + .home-toc-sub { display: block; }
 
-/* ===== Finance password gate (option A) ===== */
-.finance-lock {
-  margin: 1.5rem 0 3rem;
-}
-.finance-lock-card {
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 1.75rem 1.5rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-.finance-lock-eyebrow {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-  margin-bottom: 0.5rem;
-}
-.finance-lock-card h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text);
-  margin-bottom: 0.5rem;
-}
-.finance-lock-hint {
-  font-size: 0.85rem;
+/* ===== Private TOC gate ===== */
+.home-toc-lock-icon {
+  flex: none;
   color: var(--color-text-muted);
-  margin-bottom: 1.25rem;
-  line-height: 1.55;
 }
-.finance-lock-label {
-  display: block;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  margin-bottom: 0.35rem;
+.home-toc-gate {
+  padding: 0.35rem 1.25rem 0.55rem;
 }
-.finance-lock-row {
+.home-toc-gate-form {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
-.finance-lock-input {
+.home-toc-gate-input {
   flex: 1;
   min-width: 0;
-  padding: 0.55rem 0.85rem;
+  padding: 0.35rem 0.65rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
   background: var(--color-bg);
   color: var(--color-text);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
 }
-.finance-lock-input:focus {
+.home-toc-gate-input:focus {
   outline: none;
   border-color: var(--color-primary);
 }
-.finance-lock-btn {
+.home-toc-gate-btn {
   flex: none;
-  padding: 0.55rem 1.1rem;
+  padding: 0.35rem 0.7rem;
   border: none;
   border-radius: 999px;
   background: var(--color-primary);
   color: #fff;
   font-family: inherit;
-  font-size: 0.88rem;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--transition);
 }
-.finance-lock-btn:hover { background: var(--color-primary-light); }
-.finance-lock-error {
-  margin-top: 0.65rem;
-  font-size: 0.8rem;
+.home-toc-gate-btn:hover { background: var(--color-primary-light); }
+.home-toc-gate-error {
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
   color: #c45c6a;
 }
 
