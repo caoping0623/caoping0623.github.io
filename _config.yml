@@ -43,6 +43,14 @@ exclude:
   - node_modules
   - vendor
 
+# Finance articles (categories: 财经) require this password in the browser.
+# Option A: casual gate only — markdown remains in the public repo.
+# Change password: node -e "console.log(require('crypto').createHash('sha256').update('新密码','utf8').digest('hex'))"
+# then paste the hex into password_hash below. Default password: caoping-finance
+finance_lock:
+  enabled: true
+  password_hash: "1d1a5e9679ca2b17e11361df490428da7c2e6b55634ffa3d564ffafedc3d7d70"
+
 # Navigation
 nav:
   - title: "首页"
