@@ -240,7 +240,19 @@ permalink: /
   <ul class="toc-sidebar-list home-toc-list">
     {% assign cats = site.categories | sort %}
     {% assign lock_cat = site.finance_lock.category | default: 'others' %}
+    {% assign toc_cats = '' | split: '' %}
+    {% assign others_cat = nil %}
     {% for cat in cats %}
+      {% if cat[0] == lock_cat %}
+        {% assign others_cat = cat %}
+      {% else %}
+        {% assign toc_cats = toc_cats | push: cat %}
+      {% endif %}
+    {% endfor %}
+    {% if others_cat %}
+      {% assign toc_cats = toc_cats | push: others_cat %}
+    {% endif %}
+    {% for cat in toc_cats %}
     {% assign is_private = false %}
     {% if site.finance_lock.enabled and cat[0] == lock_cat %}
       {% assign is_private = true %}
