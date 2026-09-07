@@ -43,14 +43,14 @@ exclude:
   - node_modules
   - vendor
 
-# Private category (categories: 私人) — expanding that folder in the homepage
+# Private category (categories: others) — expanding that folder in the homepage
 # TOC requires this password. Articles themselves are not gated after unlock.
 # Change password:
 #   node -e "console.log(require('crypto').createHash('sha256').update('新密码','utf8').digest('hex'))"
 # Default password: @amycao0623
 finance_lock:
   enabled: true
-  category: "私人"
+  category: "others"
   password_hash: "6dd3782da46491aab3b2140875a3ee2fd1c491293e60a13ff440818792d9b2ef"
 
 # Navigation

@@ -239,7 +239,7 @@ permalink: /
   </div>
   <ul class="toc-sidebar-list home-toc-list">
     {% assign cats = site.categories | sort %}
-    {% assign lock_cat = site.finance_lock.category | default: '私人' %}
+    {% assign lock_cat = site.finance_lock.category | default: 'others' %}
     {% for cat in cats %}
     {% assign is_private = false %}
     {% if site.finance_lock.enabled and cat[0] == lock_cat %}
@@ -388,7 +388,7 @@ permalink: /
 
   <div class="post-grid">
     {% assign shown = 0 %}
-    {% assign hide_cat = site.finance_lock.category | default: '私人' %}
+    {% assign hide_cat = site.finance_lock.category | default: 'others' %}
     {% for post in site.posts %}
       {% if post.categories contains hide_cat %}{% continue %}{% endif %}
       {% if shown >= 10 %}{% break %}{% endif %}
