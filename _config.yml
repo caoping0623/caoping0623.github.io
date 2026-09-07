@@ -47,11 +47,11 @@ exclude:
 # TOC requires this password. Articles themselves are not gated after unlock.
 # Change password:
 #   node -e "console.log(require('crypto').createHash('sha256').update('新密码','utf8').digest('hex'))"
-# Default password: caoping-finance
+# Default password: @amycao0623
 finance_lock:
   enabled: true
   category: "私人"
-  password_hash: "1d1a5e9679ca2b17e11361df490428da7c2e6b55634ffa3d564ffafedc3d7d70"
+  password_hash: "6dd3782da46491aab3b2140875a3ee2fd1c491293e60a13ff440818792d9b2ef"
 
 # Navigation
 nav:
