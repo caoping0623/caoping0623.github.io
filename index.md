@@ -267,8 +267,7 @@ permalink: /
         </form>
         <p class="home-toc-gate-error" hidden>密码不对</p>
       </div>
-      <ul class="home-toc-sub" data-private-posts='[{% for post in cat[1] %}{"t":{{ post.title | jsonify }},"u":{{ post.url | relative_url | jsonify }}}{% unless forloop.last %},{% endunless %}{% endfor %}]'></ul>
-      {% else %}
+      {% endif %}
       <ul class="home-toc-sub">
         {% for post in cat[1] %}
         <li class="toc-item toc-h3">
@@ -276,7 +275,6 @@ permalink: /
         </li>
         {% endfor %}
       </ul>
-      {% endif %}
     </li>
     {% endfor %}
   </ul>
@@ -318,31 +316,10 @@ permalink: /
     return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(hex);
   }
 
-  function fillPrivateList(ul) {
-    if (!ul || ul.getAttribute('data-filled') === '1') return;
-    var raw = ul.getAttribute('data-private-posts') || '[]';
-    var posts;
-    try { posts = JSON.parse(raw); } catch (e) { posts = []; }
-    ul.innerHTML = '';
-    posts.forEach(function (p) {
-      var li = document.createElement('li');
-      li.className = 'toc-item toc-h3';
-      var a = document.createElement('a');
-      a.href = p.u;
-      a.textContent = p.t;
-      li.appendChild(a);
-      ul.appendChild(li);
-    });
-    ul.setAttribute('data-filled', '1');
-    ul.removeAttribute('data-private-posts');
-  }
-
   function unlockGroup(group) {
     var btn = group.querySelector('.home-toc-cat');
     var gate = group.querySelector('.home-toc-gate');
-    var sub = group.querySelector('.home-toc-sub');
     var icon = group.querySelector('.home-toc-lock-icon');
-    fillPrivateList(sub);
     if (gate) gate.hidden = true;
     if (icon) icon.hidden = true;
     if (btn) {
@@ -362,7 +339,6 @@ permalink: /
     var form = gate && gate.querySelector('.home-toc-gate-form');
     var input = gate && gate.querySelector('.home-toc-gate-input');
     var err = gate && gate.querySelector('.home-toc-gate-error');
-    var sub = group && group.querySelector('.home-toc-sub');
 
     if (btn.getAttribute('data-private') === 'true' && isSessionUnlocked()) {
       unlockGroup(group);
@@ -380,11 +356,7 @@ permalink: /
         return;
       }
 
-      if (needsLock && isSessionUnlocked()) {
-        fillPrivateList(sub);
-        btn.removeAttribute('data-private');
-      }
-
+      if (needsLock) btn.removeAttribute('data-private');
       btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
       if (gate) gate.hidden = true;
     });

@@ -617,7 +617,8 @@ pre code {
 
 /* Sub-list is collapsed until its own toggle says otherwise. */
 .home-toc-sub { display: none; padding-bottom: 0.3rem; }
-.home-toc-cat[aria-expanded="true"] + .home-toc-sub { display: block; }
+/* ~ not +: the private group has a password gate between the button and the list. */
+.home-toc-cat[aria-expanded="true"] ~ .home-toc-sub { display: block; }
 
 /* ===== Private TOC gate ===== */
 .home-toc-lock-icon {
