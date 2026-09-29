@@ -305,6 +305,8 @@ if __name__ == "__main__":
 
 - **函数签名的类型标注会被自动转成 JSON Schema**，你不用手写那一大坨 `parameters`。
 - **docstring 会变成工具的 `description`**，也就是模型判断"该不该调"的依据——所以 docstring 要认真写。
+- SDK 扫描函数签名，生成 2.3 那种 schema，再通过 MCP 发给客户端，客户端再转成模型能看的 Function Calling 表单。
+- 你省下的是「手写表单」；模型那边最终看到的，仍然是一张带字段、类型、必填项的表。
 - 这个文件写完之后，**Cursor、Claude Desktop、Hermes、任何支持 MCP 的客户端都能直接用**，一行适配代码都不用改。
 
 ### 3.4 两种传输方式
