@@ -36,46 +36,46 @@ excerpt: "这几个词经常被混着说，但它们处在完全不同的层次�
 - **Skills** = 你写给他的**岗位 SOP 手册**。"发布周报时，先从 Jira 拉数据，再按这个模板排版，标题必须是这个格式……"手册不给他任何新能力，但决定了他做事的**质量和一致性**。
 - **Plugin** = 这家公司的**组织架构图，而且交到你手上让你改**。前三样都是"围着这位助理做配置"，plugin 是"重新定义这位助理是谁"：换掉他的大脑（模型）、改掉他的员工手册总纲（系统提示词）、给他派一个合规审查员（工具执行前的硬闸门）、规定他这个岗位能看到哪些工具和哪些 SOP，甚至改掉他"接活—干活—交活"的工作节奏。
 
-前三者的关系是**叠加**的，不是替代；plugin 则是**套在外面的那一层**：
+前三者的关系是**叠加**的，不是替代；plugin 则是**套在外面的那一层**。读图时记住：**虚线是「写进模型上下文」，实线才是「调用 / 执行」。Skill 不会去调用 Function Calling**——它只是一份被塞进上下文的手册，真正填表、真正动手的是模型和宿主。
 
 <div class="mermaid">
-graph TB
+flowchart TB
     U["用户：帮我把本周的 Jira 工单整理成周报"]
+    P["🧩 Plugin：装配这个 Agent<br/>选模型 · 挂哪些 MCP · 加载哪本手册 · 谁来审批"]
 
-    subgraph L4["🧩 Plugin 层 —— 这个 Agent 是谁（装配）"]
-        P["装什么模型 / 挂哪些 MCP<br/>加载哪些 Skill / 谁来审批"]
-    end
+    S["📖 Skill 手册<br/>weekly-report/SKILL.md<br/>步骤 / 模板 / 规范<br/>自己不能执行任何工具"]
+    T["🔌 工具从哪来<br/>Jira MCP · 文件系统 MCP<br/>+ 内置 terminal / read_file"]
 
-    subgraph L3["📖 Skills 层 —— 怎么做"]
-        S["weekly-report/SKILL.md<br/>步骤 / 模板 / 规范"]
-    end
+    LLM["🧠 模型这一轮同时看见两样东西<br/>手册告诉它怎么做 · 表单告诉它能做什么<br/>Function Calling = 决定填哪张表、格子填什么"]
 
-    subgraph L2["🧠 Function Calling 层 —— 决定做什么"]
-        B["LLM 读取工具清单<br/>输出 JSON 调用请求"]
-    end
-
-    subgraph L1["🔌 MCP 层 —— 能做什么"]
-        M1[Jira MCP Server]
-        M2[文件系统 MCP Server]
-        M3[内置工具 terminal / read_file]
-    end
+    X["宿主按 JSON 转发 —— 这才是真正的调用"]
+    M1["Jira MCP Server"]
+    M2["文件系统 MCP Server"]
+    M3["内置工具"]
+    R["结果回填给模型"]
+    OUT["生成周报"]
 
     U --> P
-    P --> S
-    S --> B
-    B --> M1
-    B --> M2
-    B --> M3
-    M1 --> R[结果回填给 LLM]
+    P -.加载手册.-> S
+    P -.接上工具.-> T
+    S -.->|"写入上下文：怎么做<br/>不是调用"| LLM
+    T -.->|"写成 tools 清单：能做什么<br/>不是调用"| LLM
+    LLM -->|"输出 JSON：调 jira_search / write_file"| X
+    X --> M1
+    X --> M2
+    X --> M3
+    M1 --> R
     M2 --> R
     M3 --> R
-    R --> B
-    B --> OUT[生成周报]
+    R --> LLM
+    LLM --> OUT
 
     style U fill:#b5ead7,color:#3d3556
     style P fill:#d4bbff,color:#3d3556
     style S fill:#ffdac1,color:#3d3556
-    style B fill:#c7ceea,color:#3d3556
+    style T fill:#bee3db,color:#3d3556
+    style LLM fill:#c7ceea,color:#3d3556
+    style X fill:#e2f0cb,color:#3d3556
     style M1 fill:#bee3db,color:#3d3556
     style M2 fill:#bee3db,color:#3d3556
     style M3 fill:#bee3db,color:#3d3556
@@ -1292,4 +1292,4 @@ graph LR
 
 ---
 
-*本文最后更新于 2026 年 9 月 3 日（新增 Plugin 一节与四者对比）*
+*本文最后更新于 2026 年 9 月 29 日（重绘 §1.2 关系图：虚线=写入上下文，实线=调用）*
