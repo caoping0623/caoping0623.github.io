@@ -1,5 +1,5 @@
 ---
-title: "Copilot、Cursor、Claude Code 的约束文件全解：rules、instructions、skills 放哪、管多宽、谁能读到"
+title: "Copilot、Cursor、Claude Code 约束文件全解"
 date: 2026-10-19
 categories: [AI]
 tags: [GitHub Copilot, Cursor, Claude Code, AGENTS.md, CLAUDE.md, Rules, Skills, AI Agent, 配置]
