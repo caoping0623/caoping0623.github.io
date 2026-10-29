@@ -14,11 +14,11 @@ excerpt: "Harness 不是玄学新词。对车载工程师来说，它很像 SIL/
 
 ---
 
-## 一、先忘掉「AI」，用你已经会的东西理解它
+## 一、用测试架理解 Harness
 
-### 1.1 一个你一定做过的类比
+### 1.1 和 SIL 测试架对照
 
-假设你在做 **SIL（Software-in-the-Loop）**：
+以 **SIL（Software-in-the-Loop，软件在环）** 为例：
 
 | 角色 | SIL 里是什么 | AI 里对应什么 |
 | --- | --- | --- |
