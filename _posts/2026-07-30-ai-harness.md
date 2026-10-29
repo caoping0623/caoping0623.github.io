@@ -27,6 +27,45 @@ excerpt: "Harness 不是玄学新词。对车载工程师来说，它很像 SIL/
 | **测试架（Harness）** | 激励注入、I/O 映射、断言、日志、复位、故障注入 | **工具调用、权限、记忆、校验环、审批门、观测与回放** |
 | **判定** | 通过/失败、覆盖率、时序是否满足 | 任务是否完成、测试是否绿、是否越权 |
 
+**「环境」这一行不要读成零件翻译表。** 车辆动力学 ≠ 仓库，CAN ≠ 浏览器。两边列的都是**例子**：被测件外面那个「它以为自己连着的世界」。SIL 里是仿真车世界；Agent 里是工程世界（代码仓、文档、脚本、诊断通道等）。Harness 是夹具；环境是夹具接上去的那一侧。
+
+<div class="mermaid">
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '15px'}}}%%
+graph TB
+    subgraph SIL["SIL"]
+        S_SW["被测：控制器软件"]
+        S_H["Harness<br/>激励 / 接线 / 断言 / 日志"]
+        S_E["环境（例子）<br/>动力学 · 传感器仿真 · CAN"]
+        S_SW --- S_H
+        S_H --- S_E
+    end
+
+    subgraph AI["Agent"]
+        A_M["被测 / 被驱：LLM"]
+        A_H["Harness<br/>工具调用 / 权限 / 校验 / 观测"]
+        A_E["环境（例子）<br/>仓库 · 文档 · 工具 · 诊断接口"]
+        A_M --- A_H
+        A_H --- A_E
+    end
+
+    SIL -. "同一层职责" .- AI
+
+    style S_SW fill:#c7ceea,color:#3d3556
+    style A_M fill:#c7ceea,color:#3d3556
+    style S_H fill:#bee3db,color:#3d3556
+    style A_H fill:#bee3db,color:#3d3556
+    style S_E fill:#ffdac1,color:#3d3556
+    style A_E fill:#ffdac1,color:#3d3556
+</div>
+
+按职责对照更清楚（仍是「层」对「层」，不是一对一替换）：
+
+| 抽象职责 | SIL 里常见实现 | Agent 里常见实现 |
+| --- | --- | --- |
+| 提供当前世界状态 | 动力学、传感器仿真 | 仓库现状、日志、需求与配置 |
+| 提供对外通道 | CAN / 以太网仿真 | Git、终端、MCP、浏览器、诊断接口 |
+| 夹具本身（不是环境） | 激励、I/O 映射、断言 | 工具调用、权限门、校验环、回放 |
+
 SIL/HIL 里你绝不会说：「算法够强就行，台架随便搭。」  
 AI 里同理：**模型再强，没有 harness，它也只是会说话的计算器**；有了 harness，它才变成能在真实工程环境里做事的 Agent。
 
