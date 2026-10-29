@@ -314,7 +314,7 @@ CI（持续集成）是仓库上那套自动检查：一推代码或提 PR，就
 | 权限 / 沙箱 / CI | 安全与校验环 |
 | Trace / 日志 | 观测与改进依据 |
 
-**Harness 是总装；MCP/Skills 是总装里的线束和 SOP。**
+**Harness 是总装；MCP/Skills 是总装里的线束和 SOP（Standard Operating Procedure，标准作业程序 / 操作规范）。**
 
 ---
 
