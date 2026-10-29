@@ -257,8 +257,12 @@ permalink: /
     {% if site.finance_lock.enabled and cat[0] == lock_cat %}
       {% assign is_private = true %}
     {% endif %}
+    {% assign cat_expanded = false %}
+    {% if cat[0] == 'AI' and is_private == false %}
+      {% assign cat_expanded = true %}
+    {% endif %}
     <li class="home-toc-group{% if is_private %} home-toc-private{% endif %}">
-      <button type="button" class="home-toc-cat" aria-expanded="false"{% if is_private %} data-private="true"{% endif %}>
+      <button type="button" class="home-toc-cat" aria-expanded="{% if cat_expanded %}true{% else %}false{% endif %}"{% if is_private %} data-private="true"{% endif %}>
         <svg class="home-toc-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <polyline points="9 6 15 12 9 18"/>
         </svg>
